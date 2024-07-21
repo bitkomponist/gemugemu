@@ -22,13 +22,24 @@ export class EntityContainer {
       return true;
     }
   })
+
   get entities() {
     return this.#entitiesProxy;
   }
+
   set entities(entities: Entity[]) {
     const proxy = this.#entitiesProxy;
     proxy.splice(0, proxy.length);
     proxy.push(...entities);
+  }
+
+  getGrandChildren() {
+    const result: Entity[] = [];
+    for (const child of this.#entities) {
+      result.push(child);
+      result.push(...child.getGrandChildren());
+    }
+    return result;
   }
 }
 

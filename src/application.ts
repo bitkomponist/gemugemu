@@ -43,7 +43,7 @@ export abstract class Application {
     this.renderables = [];
 
     // todo solve nested
-    for (const entity of this.root?.entities ?? []) {
+    for (const entity of this.root?.getGrandChildren() ?? []) {
       for (const component of entity.components) {
         if (component.update) {
           this.updateables.push(component);
@@ -71,8 +71,13 @@ export abstract class Application {
     canvas.clear();
     for (const component of this.renderables) {
       canvas.context.save();
-      //todo solve nested transforms
-      canvas.applyTransform(component.entity.requireComponent(Transform));
+      let currentTransform = component.entity.getComponent(Transform);
+      const ts: Transform[] = [];
+      while (currentTransform) {
+        ts.push(currentTransform);
+        currentTransform = currentTransform.getParentTransform();
+      }
+      ts.reverse().forEach(t => canvas.applyTransform(t));
       component.render?.(canvas);
       canvas.context.restore();
     }

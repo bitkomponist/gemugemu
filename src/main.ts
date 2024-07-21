@@ -7,7 +7,7 @@ import './style.css'
 import { Transform } from './transform.component';
 
 export @InstantiableComponent() class Orbiter extends Component {
-  center: Vector2 = { x: 200, y: 200 };
+  center: Vector2 = { x: 0, y: 0 };
   distance = 100;
   speed = .001;
   angle = 0;
@@ -39,7 +39,6 @@ function RotatingRectPrefab(overrides: Partial<EntityDescriptor> = {}): EntityDe
       ...overrides.components ?? [],
       {
         type: 'Transform',
-        pivot: { x: 5, y: 5 }
       },
       {
         type: 'Orbiter',
@@ -54,42 +53,45 @@ function RotatingRectPrefab(overrides: Partial<EntityDescriptor> = {}): EntityDe
 class Snek extends Application {
   root = Entity.fromDescriptor({
     entities: [
-      RotatingRectPrefab(),
       {
         components: [
           {
             type: 'Transform',
-            pivot: { x: 15, y: 15 }
+            scale: { x: 2, y: 2 }
           },
           {
             type: 'Orbiter',
-            angle: 200,
-            speed: .003,
-            distance: 75
-          },
-          {
-            type: 'RectShape',
-            size: { x: 30, y: 30 },
-            fill: '#ff0000'
+            center: { x: 400, y: 300 },
+            distance: 50,
+            speed: 0.001,
           }
-        ]
-      },
-      {
-        components: [
+        ],
+        entities: [
           {
-            type: 'Transform',
-            pivot: { x: 10, y: 10 }
+            components: [
+              {
+                type: 'Transform',
+                position: { x: 0, y: 0 }
+              },
+              {
+                type: 'RectShape',
+                size: { x: 30, y: 30 },
+                fill: '#ff0000'
+              }
+            ]
           },
           {
-            type: 'Orbiter',
-            angle: 100,
-            speed: .002,
-            distance: 50
-          },
-          {
-            type: 'RectShape',
-            size: { x: 20, y: 20 },
-            fill: '#0000ff'
+            components: [
+              {
+                type: 'Transform',
+                position: { x: 5, y: 5 }
+              },
+              {
+                type: 'RectShape',
+                size: { x: 20, y: 20 },
+                fill: '#0000ff'
+              }
+            ]
           }
         ]
       }

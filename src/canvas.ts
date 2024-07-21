@@ -1,3 +1,4 @@
+import { Vector2 } from "./math";
 import { Transform } from "./transform.component";
 
 export class Canvas {
@@ -29,15 +30,11 @@ export class Canvas {
     this.context.clearRect(0, 0, this.width, this.height);
   }
 
-  applyTransform(t: Transform) {
+  applyTransform(t: { position: Vector2, scale: Vector2, rotation: number }) {
     const { x, y } = t.position;
     const { x: scaleX, y: scaleY } = t.scale;
-    const { x: pX, y: pY } = t.pivot;
     this.context.translate(x, y);
-    this.context.translate(pX, pY);
-    this.context.rotate(t.rotation);
-    this.context.translate(pX * -1, pY * -1);
     this.context.scale(scaleX, scaleY);
-
+    this.context.rotate(t.rotation);
   }
 }
