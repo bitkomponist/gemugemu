@@ -1,10 +1,10 @@
-import { Component, InstantiableComponent } from '~/gg/component';
-import { Shape } from '~/gg/components/shape.component';
-import { Transform } from '~/gg/components/transform.component';
-import { createPrefab } from '~/gg/entity';
-import { isKeyPressed } from '~/gg/keyboard';
-import { Vector2 } from '~/gg/math';
-import { OriginGraphPrefab } from '~/gg/prefabs/origin-graph.prefab';
+import { Component, InstantiableComponent } from '@gg/component';
+import { Shape } from '@gg/components/shape.component';
+import { Transform } from '@gg/components/transform.component';
+import { createPrefab, Entity } from '@gg/entity';
+import { isKeyPressed } from '@gg/keyboard';
+import { Vector2 } from '@gg/math';
+import { OriginGraphPrefab } from '@gg/prefabs/origin-graph.prefab';
 
 export
 @InstantiableComponent()
@@ -45,27 +45,21 @@ class BreakoutPlayerControls extends Component {
 
 export const BreakoutPlayerPrefab = createPrefab(() => ({
   components: [
-    {
-      type: Transform.name,
-      position: { x: 400, y: 550 },
-    },
-    {
-      type: BreakoutPlayerControls.name,
-    },
+    Component.describe(Transform, { position: { x: 400, y: 550 } }),
+    Component.describe(BreakoutPlayerControls)
   ],
   entities: [
-    {
+    Entity.describe({
       id: 'player-shape',
       components: [
-        { type: Transform.name, position: { x: -50, y: -15 } },
-        {
-          type: Shape.name,
+        Component.describe(Transform, { position: { x: -50, y: -15 } }),
+        Component.describe(Shape, {
           fill: '#3333ff',
           path: 'l 100 0 l 100 30 l 0 30 l 0 0',
           cache: { x: 100, y: 30 },
-        },
+        })
       ],
-    },
+    }),
     OriginGraphPrefab(),
   ],
 }));

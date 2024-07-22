@@ -1,4 +1,4 @@
-import { ApplicationDescriptor } from '~/gg/application';
+import { ApplicationDescriptor } from '@gg/application';
 import { BreakoutBricksPrefab } from './bricks';
 import { BreakoutPlayerPrefab } from './player';
 

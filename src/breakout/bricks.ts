@@ -1,9 +1,9 @@
-import { Component, InstantiableComponent } from '~/gg/component';
-import { Shape } from '~/gg/components/shape.component';
-import { Transform } from '~/gg/components/transform.component';
-import { createPrefab, Entity } from '~/gg/entity';
-import { Vector2 } from '~/gg/math';
-import { OriginGraphPrefab } from '~/gg/prefabs/origin-graph.prefab';
+import { Component, InstantiableComponent } from '@gg/component';
+import { Shape } from '@gg/components/shape.component';
+import { Transform } from '@gg/components/transform.component';
+import { createPrefab, Entity } from '@gg/entity';
+import { Vector2 } from '@gg/math';
+import { OriginGraphPrefab } from '@gg/prefabs/origin-graph.prefab';
 
 const BrickPrefab = createPrefab(
   ({ size = { x: 100, y: 20 }, color = '#aaaaee' }: { size?: Vector2; color?: string } = {}) => ({
