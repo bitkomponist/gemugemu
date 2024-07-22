@@ -1,6 +1,9 @@
 import { merge } from 'lodash';
+import { Application } from './application';
 import { Component, ComponentDescriptor } from './component';
 export class EntityContainer {
+  parent?: EntityContainer;
+  #application?: Application;
   #entities: Entity[] = [];
   #entitiesProxy = new Proxy(this.#entities, {
     deleteProperty: (target, property) => {
@@ -17,11 +20,34 @@ export class EntityContainer {
           throw new Error(`tried to add entity to multiple containers`);
         }
         value.parent = this;
+
         // todo, initialization;
       }
       return true;
     },
   });
+
+  set application(application: Application | undefined) {
+    const prev = this.application;
+
+    if (this.parent) {
+      this.parent.application = application;
+    } else {
+      this.#application = application;
+    }
+
+    if (!prev && application) {
+      for (const entity of this.entities) {
+        for (const comp of entity.components) {
+          comp.init?.();
+        }
+      }
+    }
+  }
+
+  get application() {
+    return this.parent ? this.parent.application : this.#application;
+  }
 
   get entities() {
     return this.#entitiesProxy;
@@ -52,7 +78,6 @@ export type EntityDescriptor = {
 let entityCount = 0;
 
 export class Entity extends EntityContainer {
-  parent?: EntityContainer;
 
   static fromDescriptor({
     id,
@@ -90,7 +115,10 @@ export class Entity extends EntityContainer {
       target[property as any] = value;
       if (value instanceof Component) {
         value.entity = this;
-        value.init?.();
+        // when already in root hierarchy, initialize
+        if (this.application) {
+          value.init?.();
+        }
       }
       return true;
     },

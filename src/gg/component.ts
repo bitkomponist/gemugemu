@@ -73,4 +73,8 @@ export abstract class Component {
     Object.assign(this, props);
     return this;
   }
+
+  get application() {
+    return this.entity?.application;
+  }
 }

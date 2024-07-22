@@ -13,9 +13,24 @@ export class Application {
     return new Application(root);
   }
 
+  #root?: EntityContainer;
   canvas = new Canvas({ selector: '#app' });
 
-  constructor(public root?: EntityContainer) { }
+  constructor(root?: EntityContainer) {
+    this.root = root;
+  }
+
+  set root(root: EntityContainer | undefined) {
+    this.#root = root;
+    if (root) {
+      root.application = this;
+    }
+  }
+
+  get root() {
+    return this.#root;
+  }
+
   private currentAnimationFrame?: number;
   private lastTime = 0;
 
@@ -51,7 +66,6 @@ export class Application {
     this.updateables = [];
     this.renderables = [];
 
-    // todo solve nested
     for (const entity of this.root?.getGrandChildren() ?? []) {
       for (const component of entity.components) {
         if (component.update) {
