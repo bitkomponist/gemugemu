@@ -1,4 +1,4 @@
-import { Component, ComponentDescriptor } from "./component";
+import { Component, ComponentDescriptor } from './component';
 import { merge } from 'lodash';
 export class EntityContainer {
   #entities: Entity[] = [];
@@ -20,8 +20,8 @@ export class EntityContainer {
         // todo, initialization;
       }
       return true;
-    }
-  })
+    },
+  });
 
   get entities() {
     return this.#entitiesProxy;
@@ -44,24 +44,30 @@ export class EntityContainer {
 }
 
 export type EntityDescriptor = {
-  id?: string,
-  components?: ComponentDescriptor[]
-  entities?: EntityDescriptor[]
-}
+  id?: string;
+  components?: ComponentDescriptor[];
+  entities?: EntityDescriptor[];
+};
 
 let entityCount = 0;
 
 export class Entity extends EntityContainer {
   parent?: EntityContainer;
 
-  static fromDescriptor({ id, components: componentDescriptors, entities: entityDescriptors }: EntityDescriptor): Entity {
-    const components = componentDescriptors?.map(descriptor => {
-      return Component.fromDescriptor(descriptor);
-    }) ?? [];
+  static fromDescriptor({
+    id,
+    components: componentDescriptors,
+    entities: entityDescriptors,
+  }: EntityDescriptor): Entity {
+    const components =
+      componentDescriptors?.map((descriptor) => {
+        return Component.fromDescriptor(descriptor);
+      }) ?? [];
 
-    const entities = entityDescriptors?.map(descriptor => {
-      return Entity.fromDescriptor(descriptor);
-    }) ?? [];
+    const entities =
+      entityDescriptors?.map((descriptor) => {
+        return Entity.fromDescriptor(descriptor);
+      }) ?? [];
 
     return new Entity(id ?? `E${++entityCount}`, components, entities);
   }
@@ -82,10 +88,14 @@ export class Entity extends EntityContainer {
         value.init?.();
       }
       return true;
-    }
+    },
   });
 
-  constructor(public readonly id: string, components: Component[] = [], entities: Entity[] = []) {
+  constructor(
+    public readonly id: string,
+    components: Component[] = [],
+    entities: Entity[] = [],
+  ) {
     super();
     this.entities = entities;
     this.components = components;
@@ -117,6 +127,9 @@ export class Entity extends EntityContainer {
 export function createPrefab<P extends object = any>(descriptor: (props?: P) => EntityDescriptor) {
   return (propsWithOverrides: Partial<P> & { overrides?: Partial<EntityDescriptor> } = {}) => {
     const { overrides, ...props } = propsWithOverrides;
-    return merge<EntityDescriptor, Partial<EntityDescriptor>>(descriptor(props as P), overrides ?? {});
-  }
+    return merge<EntityDescriptor, Partial<EntityDescriptor>>(
+      descriptor(props as P),
+      overrides ?? {},
+    );
+  };
 }

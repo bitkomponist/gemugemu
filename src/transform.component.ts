@@ -1,8 +1,10 @@
-import { Component, InstantiableComponent } from "./component";
-import { Entity } from "./entity";
-import { Vector2 } from "./math";
+import { Component, InstantiableComponent } from './component';
+import { Entity } from './entity';
+import { Vector2 } from './math';
 
-export @InstantiableComponent() class Transform extends Component {
+export
+@InstantiableComponent()
+class Transform extends Component {
   position: Vector2 = { x: 0, y: 0 };
   scale: Vector2 = { x: 1, y: 1 };
   rotation = 0;

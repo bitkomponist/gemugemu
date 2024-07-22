@@ -1,5 +1,5 @@
-import { Canvas } from "./canvas";
-import { Entity } from "./entity";
+import { Canvas } from './canvas';
+import { Entity } from './entity';
 
 export interface Component {
   init?(): void;
@@ -12,14 +12,19 @@ export type ComponentDescriptor<T extends Component = any> = { type: string } & 
 
 const componentNameRegistry = new Map<string, new (...args: any[]) => Component>();
 const componentRegistry = new Map<new (...args: any[]) => Component, string>();
-export function InstantiableComponent(customId?: string): (target: new (...args: any[]) => Component) => void {
+export function InstantiableComponent(
+  customId?: string,
+): (target: new (...args: any[]) => Component) => void {
   return (target) => {
     componentNameRegistry.set(customId ?? target.name, target);
     componentRegistry.set(target, customId ?? target.name);
-  }
+  };
 }
 
-function getComponentInstance<T extends Component>(ctor: new (...args: any[]) => T, props: Partial<T>) {
+function getComponentInstance<T extends Component>(
+  ctor: new (...args: any[]) => T,
+  props: Partial<T>,
+) {
   const component = new ctor();
   return component.set(props);
 }

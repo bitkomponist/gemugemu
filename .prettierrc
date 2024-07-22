@@ -1,0 +1,21 @@
+{
+  "singleQuote": true,
+  "overrides": [
+    {
+      "files": ["**/*.css", "**/*.scss", "**/*.html"],
+      "options": {
+        "singleQuote": false,
+        "printWidth": 80
+      }
+    },
+    {
+      "files": ["**/*.json"],
+      "options": {
+        "singleQuote": false,
+        "printWidth": 20
+      }
+    }
+  ],
+  "printWidth": 100,
+  "singleAttributePerLine": true
+}

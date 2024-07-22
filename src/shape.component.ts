@@ -1,15 +1,29 @@
-import { Canvas } from "./canvas";
-import { Component, InstantiableComponent } from "./component";
+import { Canvas } from './canvas';
+import { Component, InstantiableComponent } from './component';
+import { Vector2 } from './math';
 
-export @InstantiableComponent() class Shape extends Component {
+export
+@InstantiableComponent()
+class Shape extends Component {
   fill?: CanvasRenderingContext2D['fillStyle'];
   stroke?: CanvasRenderingContext2D['strokeStyle'];
   lineWidth?: CanvasRenderingContext2D['lineWidth'];
   path?: string;
+  cache?: Vector2;
+  #canvas?: Canvas;
+  #dirty = true;
 
-  private drawSegment(context: CanvasRenderingContext2D, segment: string) {
+  getCanvas() {
+    if (!this.#canvas && this.cache) {
+      this.#canvas = new Canvas({ width: this.cache.x, height: this.cache.y });
+    }
+
+    return this.#canvas;
+  }
+
+  drawSegment(context: CanvasRenderingContext2D, segment: string) {
     const [type, ...args] = segment.split(' ');
-    const nArgs = args.map(s => Number(s));
+    const nArgs = args.map((s) => Number(s));
     switch (type) {
       case 'm':
         {
@@ -45,15 +59,10 @@ export @InstantiableComponent() class Shape extends Component {
     }
   }
 
-  render({ context }: Canvas): void {
-
-    if (!this.path) {
-      return;
-    }
-
+  drawPath(path: string, context: CanvasRenderingContext2D) {
     context.beginPath();
 
-    for (const segment of this.path.split(/(?=[a-z])/)) {
+    for (const segment of path.split(/(?=[a-z])/)) {
       this.drawSegment(context, segment.trim());
     }
 
@@ -72,6 +81,19 @@ export @InstantiableComponent() class Shape extends Component {
       context.strokeStyle = this.stroke;
       context.stroke();
     }
+  }
 
+  render(targetCanvas: Canvas): void {
+    if (!this.path) {
+      return;
+    }
+    const { context } = this.cache ? this.getCanvas()! : targetCanvas;
+    if (!this.cache || this.#dirty) {
+      this.drawPath(this.path, context);
+      this.#dirty = false;
+    }
+    if (this.cache) {
+      targetCanvas.context.drawImage(this.getCanvas()!.htmlElement, 0, 0);
+    }
   }
 }

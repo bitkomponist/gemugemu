@@ -1,22 +1,21 @@
-import { Canvas } from "./canvas";
-import { Component } from "./component";
-import { Entity, EntityContainer, EntityDescriptor } from "./entity";
-import { Transform } from "./transform.component";
+import { Canvas } from './canvas';
+import { Component } from './component';
+import { Entity, EntityContainer, EntityDescriptor } from './entity';
+import { Transform } from './transform.component';
 
 export type ApplicationDescriptor = {
-  root?: { entities: EntityDescriptor[] }
-}
+  root?: { entities: EntityDescriptor[] };
+};
 export class Application {
-
   static fromDescriptor({ root: rootDescriptor }: ApplicationDescriptor) {
     const root = new EntityContainer();
-    root.entities = rootDescriptor?.entities.map(d => Entity.fromDescriptor(d)) ?? [];
+    root.entities = rootDescriptor?.entities.map((d) => Entity.fromDescriptor(d)) ?? [];
     return new Application(root);
   }
 
-  canvas = new Canvas();
+  canvas = new Canvas({ selector: '#app' });
 
-  constructor(public root?: EntityContainer) { }
+  constructor(public root?: EntityContainer) {}
   private currentAnimationFrame?: number;
   private lastTime = 0;
 
@@ -37,8 +36,8 @@ export class Application {
     this.update(time - this.lastTime);
     this.render();
     this.lastTime = time;
-    this.currentAnimationFrame = requestAnimationFrame(this.tick)
-  }
+    this.currentAnimationFrame = requestAnimationFrame(this.tick);
+  };
 
   private dirty = true;
   private renderables: Component[] = [];
@@ -87,7 +86,7 @@ export class Application {
         ts.push(currentTransform);
         currentTransform = currentTransform.getParentTransform();
       }
-      ts.reverse().forEach(t => canvas.applyTransform(t));
+      ts.reverse().forEach((t) => canvas.applyTransform(t));
       component.render?.(canvas);
       canvas.context.restore();
     }

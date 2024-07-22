@@ -4,9 +4,6 @@ import { BreakoutPlayerPrefab } from './breakout/player';
 
 export const Breakout: ApplicationDescriptor = {
   root: {
-    entities: [
-      BreakoutBricksPrefab(),
-      BreakoutPlayerPrefab()
-    ]
-  }
-}
+    entities: [BreakoutBricksPrefab(), BreakoutPlayerPrefab()],
+  },
+};

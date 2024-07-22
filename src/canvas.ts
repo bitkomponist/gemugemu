@@ -1,23 +1,39 @@
-import { Vector2 } from "./math";
+import { Vector2 } from './math';
 export class Canvas {
-  private canvas: HTMLCanvasElement;
+  #canvas: HTMLCanvasElement;
   #context: CanvasRenderingContext2D;
 
-  constructor() {
-    this.canvas = document.createElement('canvas');
-    this.canvas.width = 800;
-    this.canvas.height = 600;
-    this.canvas.style.backgroundColor = '#000';
-    document.querySelector('#app')!.appendChild(this.canvas);
-    this.#context = this.canvas.getContext('2d')!;
+  constructor({
+    width = 800,
+    height = 600,
+    clearColor = '#000',
+    selector,
+  }: {
+    width?: number;
+    height?: number;
+    clearColor?: string;
+    selector?: string;
+  } = {}) {
+    this.#canvas = document.createElement('canvas');
+    this.#canvas.width = width;
+    this.#canvas.height = height;
+    this.#canvas.style.backgroundColor = clearColor;
+    this.#context = this.#canvas.getContext('2d')!;
+    if (selector) {
+      document.querySelector('#app')?.appendChild(this.#canvas);
+    }
+  }
+
+  get htmlElement() {
+    return this.#canvas;
   }
 
   get width() {
-    return this.canvas.width;
+    return this.#canvas.width;
   }
 
   get height() {
-    return this.canvas.height;
+    return this.#canvas.height;
   }
 
   get context() {
@@ -28,7 +44,7 @@ export class Canvas {
     this.context.clearRect(0, 0, this.width, this.height);
   }
 
-  applyTransform(t: { position: Vector2, scale: Vector2, rotation: number }) {
+  applyTransform(t: { position: Vector2; scale: Vector2; rotation: number }) {
     const { x, y } = t.position;
     const { x: scaleX, y: scaleY } = t.scale;
     this.context.translate(x, y);
