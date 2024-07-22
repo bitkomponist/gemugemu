@@ -1,10 +1,10 @@
 import { Component, InstantiableComponent } from '~/gg/component';
+import { Shape } from '~/gg/components/shape.component';
+import { Transform } from '~/gg/components/transform.component';
 import { createPrefab } from '~/gg/entity';
 import { isKeyPressed } from '~/gg/keyboard';
 import { Vector2 } from '~/gg/math';
-import { Shape } from '~/gg/shape.component';
-import { Transform } from '~/gg/transform.component';
-import { OriginGraphPrefab } from '~/gg/utils/graphs';
+import { OriginGraphPrefab } from '~/gg/prefabs/origin-graph.prefab';
 
 export
 @InstantiableComponent()

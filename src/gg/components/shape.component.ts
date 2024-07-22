@@ -1,6 +1,6 @@
-import { Canvas } from './canvas';
-import { Component, InstantiableComponent } from './component';
-import { Vector2 } from './math';
+import { Canvas } from '../canvas';
+import { Component, InstantiableComponent } from '../component';
+import { Vector2 } from '../math';
 
 export
 @InstantiableComponent()

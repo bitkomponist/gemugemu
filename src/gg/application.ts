@@ -1,7 +1,7 @@
 import { Canvas } from './canvas';
 import { Component } from './component';
+import { Transform } from './components/transform.component';
 import { Entity, EntityContainer, EntityDescriptor } from './entity';
-import { Transform } from './transform.component';
 
 export type ApplicationDescriptor = {
   root?: { entities: EntityDescriptor[] };
