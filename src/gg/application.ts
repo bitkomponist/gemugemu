@@ -15,7 +15,7 @@ export class Application {
 
   canvas = new Canvas({ selector: '#app' });
 
-  constructor(public root?: EntityContainer) {}
+  constructor(public root?: EntityContainer) { }
   private currentAnimationFrame?: number;
   private lastTime = 0;
 

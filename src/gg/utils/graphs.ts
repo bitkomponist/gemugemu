@@ -1,6 +1,6 @@
-import { createPrefab } from '../entity';
-import { Shape } from '../shape.component';
-import { Transform } from '../transform.component';
+import { createPrefab } from '~/gg/entity';
+import { Shape } from '~/gg/shape.component';
+import { Transform } from '~/gg/transform.component';
 
 export const OriginGraphPrefab = createPrefab(
   ({
