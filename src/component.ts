@@ -2,6 +2,8 @@ import { Canvas } from "./canvas";
 import { Entity } from "./entity";
 
 export interface Component {
+  init?(): void;
+  destroy?(): void;
   update?(delta: number): void;
   render?(canvas: Canvas): void;
 }

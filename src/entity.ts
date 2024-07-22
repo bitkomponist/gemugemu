@@ -1,5 +1,5 @@
 import { Component, ComponentDescriptor } from "./component";
-
+import { merge } from 'lodash';
 export class EntityContainer {
   #entities: Entity[] = [];
   #entitiesProxy = new Proxy(this.#entities, {
@@ -63,7 +63,7 @@ export class Entity extends EntityContainer {
       return Entity.fromDescriptor(descriptor);
     }) ?? [];
 
-    return new Entity(id ?? `E${entityCount}`, components, entities);
+    return new Entity(id ?? `E${++entityCount}`, components, entities);
   }
 
   #components: Component[] = [];
@@ -72,14 +72,14 @@ export class Entity extends EntityContainer {
       const component = target[property as any];
       delete target[property as any];
       component.entity = undefined;
-      // todo, destroy component
+      component.destroy?.();
       return true;
     },
     set: (target, property, value) => {
       target[property as any] = value;
       if (value instanceof Component) {
         value.entity = this;
-        // todo, initialization;
+        value.init?.();
       }
       return true;
     }
@@ -87,8 +87,8 @@ export class Entity extends EntityContainer {
 
   constructor(public readonly id: string, components: Component[] = [], entities: Entity[] = []) {
     super();
-    this.components = components;
     this.entities = entities;
+    this.components = components;
   }
 
   get components() {
@@ -111,5 +111,12 @@ export class Entity extends EntityContainer {
       throw new Error(`Entity ${this.id} required missing component of type ${ctor.name}`);
     }
     return component;
+  }
+}
+
+export function createPrefab<P extends object = any>(descriptor: (props?: P) => EntityDescriptor) {
+  return (propsWithOverrides: Partial<P> & { overrides?: Partial<EntityDescriptor> } = {}) => {
+    const { overrides, ...props } = propsWithOverrides;
+    return merge<EntityDescriptor, Partial<EntityDescriptor>>(descriptor(props as P), overrides ?? {});
   }
 }

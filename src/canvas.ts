@@ -1,6 +1,4 @@
 import { Vector2 } from "./math";
-import { Transform } from "./transform.component";
-
 export class Canvas {
   private canvas: HTMLCanvasElement;
   #context: CanvasRenderingContext2D;

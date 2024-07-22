@@ -1,9 +1,19 @@
 import { Canvas } from "./canvas";
 import { Component } from "./component";
-import { EntityContainer } from "./entity";
+import { Entity, EntityContainer, EntityDescriptor } from "./entity";
 import { Transform } from "./transform.component";
 
-export abstract class Application {
+export type ApplicationDescriptor = {
+  root?: { entities: EntityDescriptor[] }
+}
+export class Application {
+
+  static fromDescriptor({ root: rootDescriptor }: ApplicationDescriptor) {
+    const root = new EntityContainer();
+    root.entities = rootDescriptor?.entities.map(d => Entity.fromDescriptor(d)) ?? [];
+    return new Application(root);
+  }
+
   canvas = new Canvas();
 
   constructor(public root?: EntityContainer) { }
