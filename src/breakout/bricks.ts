@@ -2,11 +2,11 @@ import { Component, InstantiableComponent } from '@gg/component';
 import { Shape } from '@gg/components/shape.component';
 import { Transform } from '@gg/components/transform.component';
 import { createPrefab, Entity } from '@gg/entity';
-import { Vector2 } from '@gg/math';
+import { vec2, Vector2 } from '@gg/math';
 import { OriginGraphPrefab } from '@gg/prefabs/origin-graph.prefab';
 
 const BrickPrefab = createPrefab(
-  ({ size = { x: 100, y: 20 }, color = '#aaaaee' }: { size?: Vector2; color?: string } = {}) => ({
+  ({ size = vec2(100, 20), color = '#aaaaee' }: { size?: Vector2; color?: string } = {}) => ({
     components: [
       Component.describe(Transform)
     ],
@@ -14,11 +14,11 @@ const BrickPrefab = createPrefab(
       Entity.describe({
         id: 'shape',
         components: [
-          Component.describe(Transform, { position: { x: size.x * -0.5, y: size.y * -0.5 } }),
+          Component.describe(Transform, { position: size.multiplyScalar(-.5) }),
           Component.describe(Shape, {
             fill: color,
             path: `l ${size.x} 0 l ${size.x} ${size.y} l 0 ${size.y} l 0 0`,
-            cache: { ...size }
+            cache: size.clone()
           })
         ]
       }),
@@ -34,7 +34,7 @@ class BreakoutBricksGrid extends Component {
   cols = 5;
   gap = 10;
   offsetY = 40;
-  brickSize: Vector2 = { x: 100, y: 20 };
+  brickSize = vec2(100, 20);
 
   init(): void {
     const width = (this.cols - 1) * this.gap + this.cols * this.brickSize.x;

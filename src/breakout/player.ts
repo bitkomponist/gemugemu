@@ -3,21 +3,21 @@ import { Shape } from '@gg/components/shape.component';
 import { Transform } from '@gg/components/transform.component';
 import { createPrefab, Entity } from '@gg/entity';
 import { isKeyPressed } from '@gg/keyboard';
-import { Vector2 } from '@gg/math';
 import { OriginGraphPrefab } from '@gg/prefabs/origin-graph.prefab';
+import { vec2 } from '~/gg/math';
 
 export
 @InstantiableComponent()
 class BreakoutPlayerControls extends Component {
-  #velocity: Vector2 = { x: 0, y: 0 };
+  #velocity = vec2();
   #transform?: Transform;
-  #tPos: Vector2 = { x: 0, y: 0 };
+  #tPos = vec2();
   speed = 2;
   drag = 15;
 
   init() {
     this.#transform = this.entity.requireComponent(Transform);
-    this.#tPos = { ...this.#transform.position };
+    this.#tPos = this.#transform.position.clone();
   }
 
   update(delta: number): void {
@@ -45,18 +45,18 @@ class BreakoutPlayerControls extends Component {
 
 export const BreakoutPlayerPrefab = createPrefab(() => ({
   components: [
-    Component.describe(Transform, { position: { x: 400, y: 550 } }),
+    Component.describe(Transform, { position: vec2(400, 550) }),
     Component.describe(BreakoutPlayerControls)
   ],
   entities: [
     Entity.describe({
       id: 'player-shape',
       components: [
-        Component.describe(Transform, { position: { x: -50, y: -15 } }),
+        Component.describe(Transform, { position: vec2(-50, -15) }),
         Component.describe(Shape, {
           fill: '#3333ff',
           path: 'l 100 0 l 100 30 l 0 30 l 0 0',
-          cache: { x: 100, y: 30 },
+          cache: vec2(100, 30),
         })
       ],
     }),
