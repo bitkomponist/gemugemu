@@ -77,4 +77,5 @@ export abstract class Component {
   get application() {
     return this.entity?.application;
   }
+
 }

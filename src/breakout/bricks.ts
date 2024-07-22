@@ -38,8 +38,7 @@ class BreakoutBricksGrid extends Component {
 
   init(): void {
     const width = (this.cols - 1) * this.gap + this.cols * this.brickSize.x;
-    // const height = this.rows - 1 * this.gap + this.rows * 20;
-    const offsetX = (Number(this.application?.canvas?.width) - width) / 2 + this.brickSize.x / 2;
+    const offsetX = (this.application!.viewport.x - width) / 2 + this.brickSize.x / 2;
     for (let x = 0; x < this.cols; x++) {
       for (let y = 0; y < this.rows; y++) {
         const brick = Entity.fromDescriptor(BrickPrefab());

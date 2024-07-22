@@ -17,6 +17,10 @@ class BreakoutPlayerControls extends Component {
 
   init() {
     this.#transform = this.entity.requireComponent(Transform);
+    this.#transform.position.set(
+      this.application!.viewport.x / 2,
+      this.application!.viewport.y - 50
+    );
     this.#tPos = this.#transform.position.clone();
   }
 
@@ -36,7 +40,9 @@ class BreakoutPlayerControls extends Component {
     this.#tPos.x += this.#velocity.x;
     this.#tPos.y += this.#velocity.y;
 
-    this.#tPos.x = Math.max(Math.min(750, this.#tPos.x), 50);
+    const { viewport } = this.application!;
+
+    this.#tPos.x = Math.max(Math.min(viewport.x - 50, this.#tPos.x), 50);
 
     this.#transform.position.x += (this.#tPos.x - this.#transform.position.x) / this.drag;
     this.#transform.position.y += (this.#tPos.y - this.#transform.position.y) / this.drag;
@@ -45,7 +51,7 @@ class BreakoutPlayerControls extends Component {
 
 export const BreakoutPlayerPrefab = createPrefab(() => ({
   components: [
-    Component.describe(Transform, { position: vec2(400, 550) }),
+    Component.describe(Transform),
     Component.describe(BreakoutPlayerControls)
   ],
   entities: [

@@ -2,6 +2,7 @@ import { Canvas } from './canvas';
 import { Component } from './component';
 import { Transform } from './components/transform.component';
 import { Entity, EntityContainer, EntityDescriptor } from './entity';
+import { vec2 } from './math';
 
 export type ApplicationDescriptor = {
   root?: { entities: EntityDescriptor[] };
@@ -14,7 +15,7 @@ export class Application {
   }
 
   #root?: EntityContainer;
-  canvas = new Canvas({ selector: '#app' });
+  canvas = new Canvas({ selector: '#app', width: 1024, height: 768 });
 
   constructor(root?: EntityContainer) {
     this.root = root;
@@ -29,6 +30,13 @@ export class Application {
 
   get root() {
     return this.#root;
+  }
+
+  get viewport() {
+    return vec2(
+      this.canvas.width,
+      this.canvas.height
+    );
   }
 
   private currentAnimationFrame?: number;
