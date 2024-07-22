@@ -39,7 +39,7 @@ export class EntityContainer {
     if (!prev && application) {
       for (const entity of this.entities) {
         for (const comp of entity.components) {
-          comp.init?.();
+          comp.onAddedToHierarchy();
         }
       }
     }
@@ -79,6 +79,7 @@ let entityCount = 0;
 
 export class Entity extends EntityContainer {
 
+
   static fromDescriptor({
     id,
     components: componentDescriptors,
@@ -117,7 +118,7 @@ export class Entity extends EntityContainer {
         value.entity = this;
         // when already in root hierarchy, initialize
         if (this.application) {
-          value.init?.();
+          value.onAddedToHierarchy();
         }
       }
       return true;
@@ -154,6 +155,42 @@ export class Entity extends EntityContainer {
       throw new Error(`Entity ${this.id} required missing component of type ${ctor.name}`);
     }
     return component;
+  }
+
+  findEntity(path: string) {
+    function traverse(currentEntity: Entity | undefined, segments: string[]): Entity | undefined {
+      if (!currentEntity) return undefined;
+
+      if (!segments.length) {
+        return currentEntity;
+      }
+
+      const [segment, ...childSegments] = segments;
+
+      if (segment === '.' || currentEntity?.id === segment) {
+        return traverse(currentEntity, childSegments);
+      }
+
+      if (segment === '..') {
+        return traverse(currentEntity.parent as Entity, childSegments);
+      }
+
+      for (const child of currentEntity.entities) {
+        const childResult = traverse(child, childSegments);
+        if (childResult) {
+          return childResult;
+        }
+      }
+
+      return undefined;
+    }
+
+    const relative = path.startsWith('.');
+
+    let root = relative ? this : this.application?.root;
+
+    return traverse(root as Entity, path.split('/'));
+
   }
 }
 

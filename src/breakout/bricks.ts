@@ -14,7 +14,7 @@ const BrickPrefab = createPrefab(
       Entity.describe({
         id: 'shape',
         components: [
-          Component.describe(Transform, { position: size.multiplyScalar(-.5) }),
+          Component.describe(Transform, { position: size.clone().multiplyScalar(-.5) }),
           Component.describe(Shape, {
             fill: color,
             path: `l ${size.x} 0 l ${size.x} ${size.y} l 0 ${size.y} l 0 0`,

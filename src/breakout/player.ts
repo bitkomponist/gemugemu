@@ -1,55 +1,54 @@
-import { Component, InstantiableComponent } from '@gg/component';
+import { Component, InstantiableComponent, sibling } from '@gg/component';
 import { Shape } from '@gg/components/shape.component';
 import { Transform } from '@gg/components/transform.component';
 import { createPrefab, Entity } from '@gg/entity';
 import { isKeyPressed } from '@gg/keyboard';
 import { OriginGraphPrefab } from '@gg/prefabs/origin-graph.prefab';
-import { vec2 } from '~/gg/math';
+import { clamp, vec2 } from '~/gg/math';
 
 export
 @InstantiableComponent()
 class BreakoutPlayerControls extends Component {
-  #velocity = vec2();
-  #transform?: Transform;
-  #tPos = vec2();
+  @sibling(Transform) private transform!: Transform;
+  private targetPosition = vec2();
+  private velocity = vec2();
   speed = 2;
   drag = 15;
 
   init() {
-    this.#transform = this.entity.requireComponent(Transform);
-    this.#transform.position.set(
+    this.transform.position.set(
       this.application!.viewport.x / 2,
       this.application!.viewport.y - 50
     );
-    this.#tPos = this.#transform.position.clone();
+    this.targetPosition.setVector(this.transform.position);
   }
 
   update(delta: number): void {
-    if (!this.#transform) {
+    if (!this.transform) {
       return;
     }
 
     if (isKeyPressed('ArrowLeft')) {
-      this.#velocity.x = this.speed * delta * -1;
+      this.velocity.x = this.speed * delta * -1;
     } else if (isKeyPressed('ArrowRight')) {
-      this.#velocity.x = this.speed * delta;
+      this.velocity.x = this.speed * delta;
     } else {
-      this.#velocity.x = 0;
+      this.velocity.x = 0;
     }
 
-    this.#tPos.x += this.#velocity.x;
-    this.#tPos.y += this.#velocity.y;
+    this.targetPosition.add(this.velocity);
 
     const { viewport } = this.application!;
 
-    this.#tPos.x = Math.max(Math.min(viewport.x - 50, this.#tPos.x), 50);
+    this.targetPosition.x = clamp(50, viewport.x - 50, this.targetPosition.x);
 
-    this.#transform.position.x += (this.#tPos.x - this.#transform.position.x) / this.drag;
-    this.#transform.position.y += (this.#tPos.y - this.#transform.position.y) / this.drag;
+    this.transform.position.x += (this.targetPosition.x - this.transform.position.x) / this.drag;
+    this.transform.position.y += (this.targetPosition.y - this.transform.position.y) / this.drag;
   }
 }
 
 export const BreakoutPlayerPrefab = createPrefab(() => ({
+  id: 'breakout-player',
   components: [
     Component.describe(Transform),
     Component.describe(BreakoutPlayerControls)

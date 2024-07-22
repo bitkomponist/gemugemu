@@ -8,18 +8,51 @@ export class Vector2 {
     return this;
   }
 
-  clone() {
-    return new Vector2(this.x, this.y);
+  setVector(v: Vector2) {
+    this.x = v.x;
+    this.y = v.y;
+    return this;
+  }
+
+  add(v: Vector2) {
+    this.x += v.x;
+    this.y += v.y;
+    return this;
+  }
+
+  sub(v: Vector2) {
+    this.x -= v.x;
+    this.y -= v.y;
+    return this;
+  }
+
+  multiply(v: Vector2) {
+    this.x *= v.x;
+    this.y *= v.y;
+    return this;
+  }
+
+  divide(v: Vector2) {
+    this.x /= v.x;
+    this.y /= v.y;
+    return this;
   }
 
   multiplyScalar(scalar: number) {
-    return new Vector2(
-      this.x * scalar,
-      this.y * scalar
-    );
+    this.x *= scalar;
+    this.y *= scalar;
+    return this;
+  }
+
+  clone() {
+    return new Vector2(this.x, this.y);
   }
 }
 
 export function vec2(x = 0, y = 0) {
   return new Vector2(x, y);
+}
+
+export function clamp(min: number, max: number, value: number) {
+  return Math.min(max, Math.max(min, value));
 }
