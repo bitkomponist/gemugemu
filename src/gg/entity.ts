@@ -1,5 +1,5 @@
-import { Component, ComponentDescriptor } from './component';
 import { merge } from 'lodash';
+import { Component, ComponentDescriptor } from './component';
 export class EntityContainer {
   #entities: Entity[] = [];
   #entitiesProxy = new Proxy(this.#entities, {
@@ -72,6 +72,11 @@ export class Entity extends EntityContainer {
     return new Entity(id ?? `E${++entityCount}`, components, entities);
   }
 
+  static describe(descriptor?: EntityDescriptor) {
+    return {
+      ...descriptor ?? {},
+    } as EntityDescriptor;
+  }
   #components: Component[] = [];
   #componentsProxy = new Proxy(this.#components, {
     deleteProperty: (target, property) => {
@@ -127,9 +132,10 @@ export class Entity extends EntityContainer {
 export function createPrefab<P extends object = any>(descriptor: (props?: P) => EntityDescriptor) {
   return (propsWithOverrides: Partial<P> & { overrides?: Partial<EntityDescriptor> } = {}) => {
     const { overrides, ...props } = propsWithOverrides;
-    return merge<EntityDescriptor, Partial<EntityDescriptor>>(
-      descriptor(props as P),
-      overrides ?? {},
-    );
+    return Entity.describe(
+      merge<EntityDescriptor, Partial<EntityDescriptor>>(
+        descriptor(props as P),
+        overrides ?? {},
+      ));
   };
 }

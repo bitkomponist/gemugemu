@@ -10,14 +10,17 @@ export interface Component {
 
 export type ComponentDescriptor<T extends Component = any> = { type: string } & Partial<T>;
 
-const componentNameRegistry = new Map<string, new (...args: any[]) => Component>();
+export type ComponentType<T extends Component = Component> = new (...args: any[]) => T;
+
+const componentNameRegistry = new Map<string, ComponentType>();
 const componentRegistry = new Map<new (...args: any[]) => Component, string>();
-export function InstantiableComponent(
-  customId?: string,
-): (target: new (...args: any[]) => Component) => void {
+export function InstantiableComponent(): (target: new (...args: any[]) => Component) => void {
   return (target) => {
-    componentNameRegistry.set(customId ?? target.name, target);
-    componentRegistry.set(target, customId ?? target.name);
+    if (componentNameRegistry.has(target.name)) {
+      throw new Error(`Component type ${target.name} is already registered`);
+    }
+    componentNameRegistry.set(target.name, target);
+    componentRegistry.set(target, target.name);
   };
 }
 
@@ -39,6 +42,13 @@ function getComponentInstanceById<T extends Component>(name: string, props: Part
 export abstract class Component {
   static fromDescriptor<T extends Component>({ type: id, ...props }: ComponentDescriptor) {
     return getComponentInstanceById<T>(id, props as Partial<T>);
+  }
+
+  static describe<T extends Component = any>(type: ComponentType<T>, descriptor?: Omit<ComponentDescriptor<T>, 'type'>) {
+    return {
+      ...descriptor ?? {},
+      type: type.name
+    } as ComponentDescriptor<T>;
   }
 
   #entity?: Entity;

@@ -8,23 +8,20 @@ import { OriginGraphPrefab } from '~/gg/utils/graphs';
 const BrickPrefab = createPrefab(
   ({ size = { x: 100, y: 20 }, color = '#aaaaee' }: { size?: Vector2; color?: string } = {}) => ({
     components: [
-      {
-        type: Transform.name,
-      },
+      Component.describe(Transform)
     ],
     entities: [
-      {
+      Entity.describe({
         id: 'shape',
         components: [
-          { type: Transform.name, position: { x: size.x * -0.5, y: size.y * -0.5 } },
-          {
-            type: Shape.name,
+          Component.describe(Transform, { position: { x: size.x * -0.5, y: size.y * -0.5 } }),
+          Component.describe(Shape, {
             fill: color,
             path: `l ${size.x} 0 l ${size.x} ${size.y} l 0 ${size.y} l 0 0`,
-            cache: { ...size },
-          },
-        ],
-      },
+            cache: { ...size }
+          })
+        ]
+      }),
       OriginGraphPrefab(),
     ],
   }),
