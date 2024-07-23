@@ -158,27 +158,26 @@ export class Entity extends EntityContainer {
   }
 
   findEntity(path: string) {
-    function traverse(currentEntity: Entity | undefined, segments: string[]): Entity | undefined {
-      if (!currentEntity) return undefined;
+    function traverse(entity: Entity | undefined, segments: string[]): Entity | undefined {
+      if (!entity) return undefined;
 
-      if (!segments.length) {
-        return currentEntity;
-      }
+      const [segment, ...nextSegments] = segments;
 
-      const [segment, ...childSegments] = segments;
-
-      if (segment === '.' || currentEntity?.id === segment) {
-        return traverse(currentEntity, childSegments);
+      if (segment === '.') {
+        return traverse(entity, nextSegments);
       }
 
       if (segment === '..') {
-        return traverse(currentEntity.parent as Entity, childSegments);
+        return traverse(entity.parent as Entity, nextSegments);
       }
 
-      for (const child of currentEntity.entities) {
-        const childResult = traverse(child, childSegments);
-        if (childResult) {
-          return childResult;
+      for (const child of entity.entities) {
+        if (child.id === segment) {
+          if (!nextSegments.length) {
+            return child;
+          } else {
+            return traverse(child, nextSegments);
+          }
         }
       }
 

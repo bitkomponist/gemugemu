@@ -8,7 +8,7 @@ export const Breakout: ApplicationDescriptor = {
     entities: [
       BreakoutBricksPrefab(),
       BreakoutPlayerPrefab(),
-      BreakoutBallPrefab()
+      BreakoutBallPrefab(),
     ]
   }
 }
