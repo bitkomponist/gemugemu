@@ -1,6 +1,7 @@
 
 import { Canvas } from './canvas';
 import { Entity } from './entity';
+import { System } from './system';
 
 
 export interface Component {
@@ -81,6 +82,22 @@ export abstract class Component {
 
   constructor(props?: Parameters<typeof this.set>[0]) {
     props && this.set(props);
+  }
+
+  getComponent<T extends Component>(ctor: new (...args: any[]) => T) {
+    return this.entity.getComponent(ctor);
+  }
+
+  requireComponent<T extends Component>(ctor: new (...args: any[]) => T) {
+    return this.entity.requireComponent(ctor);
+  }
+
+  getSystem<T extends System>(ctor: new (...args: any[]) => T) {
+    return this.entity.getSystem(ctor);
+  }
+
+  requireSystem<T extends System>(ctor: new (...args: any[]) => T) {
+    return this.entity.requireSystem(ctor);
   }
 
   onAddedToHierarchy() {

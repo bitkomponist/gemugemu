@@ -4,14 +4,14 @@ import { vec2 } from '../math';
 
 export
 @InstantiableComponent()
-class Transform extends Component {
+class Transform2d extends Component {
   position = vec2();
   scale = vec2(1, 1);
   rotation = 0;
 
   getParentTransform() {
     if (this.entity.parent instanceof Entity) {
-      return this.entity.parent.getComponent(Transform);
+      return this.entity.parent.getComponent(Transform2d);
     }
   }
 
@@ -20,7 +20,7 @@ class Transform extends Component {
     let globalScale = this.scale.clone();
     let globalRotation = this.rotation;
 
-    let current: Transform | undefined = this.getParentTransform();
+    let current: Transform2d | undefined = this.getParentTransform();
 
     while (current) {
       // Calculate global position

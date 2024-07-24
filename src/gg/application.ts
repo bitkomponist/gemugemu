@@ -1,23 +1,32 @@
-import { Canvas } from './canvas';
-import { Component } from './component';
-import { Transform } from './components/transform.component';
+import '@gg/registry';
 import { Entity, EntityContainer, EntityDescriptor } from './entity';
-import { vec2 } from './math';
+import { System, SystemDescriptor } from './system';
+import { ComponentManager } from './systems/component-manager.system';
+import { Renderer2d } from './systems/renderer-2d.system';
 
 export type ApplicationDescriptor = {
+  systems?: SystemDescriptor[];
   root?: { entities: EntityDescriptor[] };
 };
 export class Application {
-  static fromDescriptor({ root: rootDescriptor }: ApplicationDescriptor) {
+  static DEFAULT_SYSTEMS: SystemDescriptor[] = [
+    { type: ComponentManager.name },
+    { type: Renderer2d.name },
+  ]
+
+  static fromDescriptor({ systems = Application.DEFAULT_SYSTEMS, root: rootDescriptor }: ApplicationDescriptor) {
     const root = new EntityContainer();
     root.entities = rootDescriptor?.entities.map((d) => Entity.fromDescriptor(d)) ?? [];
-    return new Application(root);
+    return new Application(root, systems.map(d => System.fromDescriptor(d)));
   }
 
   #root?: EntityContainer;
-  canvas = new Canvas({ selector: '#app', width: 1024, height: 768 });
 
-  constructor(root?: EntityContainer) {
+  constructor(root?: EntityContainer, public systems?: System[]) {
+    this.systems?.forEach(system => {
+      system.application = this;
+    });
+
     this.root = root;
   }
 
@@ -32,12 +41,6 @@ export class Application {
     return this.#root;
   }
 
-  get viewport() {
-    return vec2(
-      this.canvas.width,
-      this.canvas.height
-    );
-  }
 
   private currentAnimationFrame?: number;
   private lastTime = 0;
@@ -56,61 +59,17 @@ export class Application {
   }
 
   private tick: FrameRequestCallback = (time) => {
-    this.update(time - this.lastTime);
-    this.render();
+    const delta = time - this.lastTime;
+
+    if (this.root) {
+      const { root } = this;
+      this.systems?.forEach(sys => {
+        sys.updateRoot?.(root, delta);
+      })
+    }
+
     this.lastTime = time;
     this.currentAnimationFrame = requestAnimationFrame(this.tick);
   };
 
-  private dirty = true;
-  private renderables: Component[] = [];
-  private updateables: Component[] = [];
-
-  updateComponentLists() {
-    if (!this.dirty) {
-      return;
-    }
-
-    this.updateables = [];
-    this.renderables = [];
-
-    for (const entity of this.root?.getGrandChildren() ?? []) {
-      for (const component of entity.components) {
-        if (component.update) {
-          this.updateables.push(component);
-        }
-        if (component.render) {
-          this.renderables.push(component);
-        }
-      }
-    }
-
-    this.dirty = false;
-  }
-
-  update(delta: number) {
-    this.dirty = true;
-    this.updateComponentLists();
-
-    for (const component of this.updateables) {
-      component.update?.(delta);
-    }
-  }
-
-  render() {
-    const { canvas } = this;
-    canvas.clear();
-    for (const component of this.renderables) {
-      canvas.context.save();
-      let currentTransform = component.entity.getComponent(Transform);
-      const ts: Transform[] = [];
-      while (currentTransform) {
-        ts.push(currentTransform);
-        currentTransform = currentTransform.getParentTransform();
-      }
-      ts.reverse().forEach((t) => canvas.applyTransform(t));
-      component.render?.(canvas);
-      canvas.context.restore();
-    }
-  }
 }

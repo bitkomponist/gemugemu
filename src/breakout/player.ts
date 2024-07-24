@@ -1,24 +1,26 @@
 import { Component, InstantiableComponent, sibling } from '@gg/component';
 import { Shape } from '@gg/components/shape.component';
-import { Transform } from '@gg/components/transform.component';
+import { Transform2d } from '@gg/components/transform-2d.component';
 import { createPrefab, Entity } from '@gg/entity';
 import { isKeyPressed } from '@gg/keyboard';
 import { OriginGraphPrefab } from '@gg/prefabs/origin-graph.prefab';
 import { clamp, vec2 } from '~/gg/math';
+import { Renderer2d } from '~/gg/systems/renderer-2d.system';
 
 export
 @InstantiableComponent()
 class BreakoutPlayerControls extends Component {
-  @sibling(Transform) private transform!: Transform;
+  @sibling(Transform2d) private transform!: Transform2d;
   private targetPosition = vec2();
   private velocity = vec2();
   speed = 2;
   drag = 15;
 
   init() {
+    const { viewport } = this.requireSystem(Renderer2d);
     this.transform.position.set(
-      this.application!.viewport.x / 2,
-      this.application!.viewport.y - 50
+      viewport.x / 2,
+      viewport.y - 50
     );
     this.targetPosition.setVector(this.transform.position);
   }
@@ -36,9 +38,9 @@ class BreakoutPlayerControls extends Component {
       this.velocity.x = 0;
     }
 
-    this.targetPosition.add(this.velocity);
+    const { viewport } = this.requireSystem(Renderer2d);
 
-    const { viewport } = this.application!;
+    this.targetPosition.add(this.velocity);
 
     this.targetPosition.x = clamp(50, viewport.x - 50, this.targetPosition.x);
 
@@ -50,14 +52,14 @@ class BreakoutPlayerControls extends Component {
 export const BreakoutPlayerPrefab = createPrefab(() => ({
   id: 'breakout-player',
   components: [
-    Component.describe(Transform),
+    Component.describe(Transform2d),
     Component.describe(BreakoutPlayerControls)
   ],
   entities: [
     Entity.describe({
       id: 'player-shape',
       components: [
-        Component.describe(Transform, { position: vec2(-50, -15) }),
+        Component.describe(Transform2d, { position: vec2(-50, -15) }),
         Component.describe(Shape, {
           fill: '#3333ff',
           path: 'l 100 0 l 100 30 l 0 30 l 0 0',

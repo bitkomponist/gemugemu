@@ -1,6 +1,7 @@
 import { merge } from 'lodash';
 import { Application } from './application';
 import { Component, ComponentDescriptor } from './component';
+import { System } from './system';
 export class EntityContainer {
   parent?: EntityContainer;
   #application?: Application;
@@ -155,6 +156,18 @@ export class Entity extends EntityContainer {
       throw new Error(`Entity ${this.id} required missing component of type ${ctor.name}`);
     }
     return component;
+  }
+
+  getSystem<T extends System>(ctor: new (...args: any[]) => T) {
+    return this.application?.systems?.find((system): system is T => system instanceof ctor);
+  }
+
+  requireSystem<T extends System>(ctor: new (...args: any[]) => T) {
+    const system = this.getSystem(ctor);
+    if (!system) {
+      throw new Error(`Entity ${this.id} required missing system of type ${ctor.name}`);
+    }
+    return system;
   }
 
   findEntity(path: string) {

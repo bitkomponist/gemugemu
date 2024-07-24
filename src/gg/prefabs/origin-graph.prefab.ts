@@ -1,5 +1,5 @@
 import { Shape } from '~/gg/components/shape.component';
-import { Transform } from '~/gg/components/transform.component';
+import { Transform2d } from '~/gg/components/transform-2d.component';
 import { createPrefab } from '~/gg/entity';
 import { Component } from '../component';
 import { vec2 } from '../math';
@@ -12,7 +12,7 @@ export const OriginGraphPrefab = createPrefab(
   }: { size?: number; color?: string; lineWidth?: number } = {}) => ({
     id: 'origin-graph',
     components: [
-      Component.describe(Transform, { position: vec2(size * -0.5, size * -0.5) }),
+      Component.describe(Transform2d, { position: vec2(size * -0.5, size * -0.5) }),
       Component.describe(Shape, {
         stroke,
         lineWidth,

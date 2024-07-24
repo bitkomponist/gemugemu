@@ -1,6 +1,7 @@
 import { Canvas } from '../canvas';
 import { Component, InstantiableComponent } from '../component';
 import { Vector2 } from '../math';
+import { Renderer2d } from '../systems/renderer-2d.system';
 
 export
 @InstantiableComponent()
@@ -83,17 +84,17 @@ class Shape extends Component {
     }
   }
 
-  render(targetCanvas: Canvas): void {
+  render2d(renderer: Renderer2d): void {
     if (!this.path) {
       return;
     }
-    const { context } = this.cache ? this.getCanvas()! : targetCanvas;
+    const { context } = this.cache ? this.getCanvas()! : renderer.canvas;
     if (!this.cache || this.#dirty) {
       this.drawPath(this.path, context);
       this.#dirty = false;
     }
     if (this.cache) {
-      targetCanvas.context.drawImage(this.getCanvas()!.htmlElement, 0, 0);
+      renderer.canvas.context.drawImage(this.getCanvas()!.htmlElement, 0, 0);
     }
   }
 }
