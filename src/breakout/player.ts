@@ -3,9 +3,9 @@ import { Shape } from '@gg/components/shape.component';
 import { Transform2d } from '@gg/components/transform-2d.component';
 import { createPrefab, Entity } from '@gg/entity';
 import { isKeyPressed } from '@gg/keyboard';
+import { clamp, vec2 } from '@gg/math';
 import { OriginGraphPrefab } from '@gg/prefabs/origin-graph.prefab';
-import { clamp, vec2 } from '~/gg/math';
-import { Renderer2d } from '~/gg/systems/renderer-2d.system';
+import { Renderer2d } from '@gg/systems/renderer-2d.system';
 
 export
 @InstantiableComponent()

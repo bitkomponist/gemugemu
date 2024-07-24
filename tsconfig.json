@@ -26,12 +26,12 @@
     "experimentalDecorators": true,
 
     "paths": {
-      "~/*": [
-        "./src/*"
-      ],
       "@gg/*": [
         "./src/gg/*",
         "./.gg/*"
+      ],
+      "~/*": [
+        "./src/*"
       ]
     }
   },

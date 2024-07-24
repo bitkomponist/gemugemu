@@ -1,9 +1,9 @@
-import { Component, entityLookup, InstantiableComponent, sibling } from "~/gg/component";
-import { Shape } from "~/gg/components/shape.component";
-import { Transform2d } from "~/gg/components/transform-2d.component";
-import { createPrefab, Entity } from "~/gg/entity";
-import { vec2 } from "~/gg/math";
-import { Renderer2d } from "~/gg/systems/renderer-2d.system";
+import { Component, entityLookup, InstantiableComponent, sibling } from "@gg/component";
+import { Shape } from "@gg/components/shape.component";
+import { Transform2d } from "@gg/components/transform-2d.component";
+import { createPrefab, Entity } from "@gg/entity";
+import { vec2 } from "@gg/math";
+import { Renderer2d } from "@gg/systems/renderer-2d.system";
 
 export @InstantiableComponent() class BreakoutBallControl extends Component {
   velocity = vec2(1, 1)

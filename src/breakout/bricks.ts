@@ -4,7 +4,7 @@ import { Transform2d } from '@gg/components/transform-2d.component';
 import { createPrefab, Entity } from '@gg/entity';
 import { vec2, Vector2 } from '@gg/math';
 import { OriginGraphPrefab } from '@gg/prefabs/origin-graph.prefab';
-import { Renderer2d } from '~/gg/systems/renderer-2d.system';
+import { Renderer2d } from '@gg/systems/renderer-2d.system';
 
 const BrickPrefab = createPrefab(
   ({ size = vec2(100, 20), color = '#aaaaee' }: { size?: Vector2; color?: string } = {}) => ({

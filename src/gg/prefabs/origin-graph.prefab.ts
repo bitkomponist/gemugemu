@@ -1,6 +1,6 @@
-import { Shape } from '~/gg/components/shape.component';
-import { Transform2d } from '~/gg/components/transform-2d.component';
-import { createPrefab } from '~/gg/entity';
+import { Shape } from '@gg/components/shape.component';
+import { Transform2d } from '@gg/components/transform-2d.component';
+import { createPrefab } from '@gg/entity';
 import { Component } from '../component';
 import { vec2 } from '../math';
 
