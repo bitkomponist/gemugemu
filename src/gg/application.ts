@@ -2,7 +2,6 @@ import '@gg/registry';
 import { Entity, EntityContainer, EntityDescriptor } from './entity';
 import { System, SystemDescriptor } from './system';
 import { ComponentManager } from './systems/component-manager.system';
-import { Renderer2d } from './systems/renderer-2d.system';
 
 export type ApplicationDescriptor = {
   systems?: SystemDescriptor[];
@@ -11,7 +10,6 @@ export type ApplicationDescriptor = {
 export class Application {
   static DEFAULT_SYSTEMS: SystemDescriptor[] = [
     { type: ComponentManager.name },
-    { type: Renderer2d.name },
   ]
 
   static fromDescriptor({ systems = Application.DEFAULT_SYSTEMS, root: rootDescriptor }: ApplicationDescriptor) {
@@ -34,13 +32,15 @@ export class Application {
     this.#root = root;
     if (root) {
       root.application = this;
+      this.systems?.forEach(sys => {
+        sys.initRoot?.(root);
+      })
     }
   }
 
   get root() {
     return this.#root;
   }
-
 
   private currentAnimationFrame?: number;
   private lastTime = 0;
@@ -51,6 +51,12 @@ export class Application {
   }
 
   stop() {
+    if (this.root) {
+      const { root } = this;
+      this.systems?.forEach(sys => {
+        sys.destructRoot?.(root);
+      })
+    }
     if (!this.currentAnimationFrame) {
       return this;
     }

@@ -2,15 +2,37 @@ import { merge } from 'lodash';
 import { Application } from './application';
 import { Component, ComponentDescriptor } from './component';
 import { System } from './system';
+
+export type Observer<T extends object> = {
+  deleteProperty?: (target: T[], property: string | symbol) => void,
+  set?: (target: T[], property: string | symbol, value: any) => void,
+}
+
 export class EntityContainer {
-  parent?: EntityContainer;
+  protected _parent?: EntityContainer;
+
+  get parent() {
+    return this._parent;
+  }
+
+  set parent(parent: EntityContainer | undefined) {
+    this._parent = parent;
+  }
+
+  #entitiesObservers: Observer<Entity>[] = [];
   #application?: Application;
   #entities: Entity[] = [];
   #entitiesProxy = new Proxy(this.#entities, {
     deleteProperty: (target, property) => {
       const entity = target[property as any];
+
+      for (const observer of this.#entitiesObservers) {
+        observer.deleteProperty?.(target, property);
+      }
+
       delete target[property as any];
       entity.parent = undefined;
+
       // todo, destroy component
       return true;
     },
@@ -22,24 +44,43 @@ export class EntityContainer {
         }
         value.parent = this;
 
+        for (const observer of this.#entitiesObservers) {
+          observer.set?.(target, property, value);
+        }
+
         // todo, initialization;
       }
       return true;
     },
   });
 
+  observeEntities(observer: Observer<Entity>) {
+    this.#entitiesObservers.push(observer);
+    return this;
+  }
+
+  unobserveEntities(observer: Observer<Entity>) {
+    const index = this.#entitiesObservers.indexOf(observer);
+    if (index > -1) {
+      this.#entitiesObservers.splice(index, 1);
+    }
+    return this;
+  }
+
   set application(application: Application | undefined) {
     const prev = this.application;
 
+    // recursively set reference to application on root
     if (this.parent) {
       this.parent.application = application;
     } else {
+      // this is root, so set application here
       this.#application = application;
     }
 
     if (!prev && application) {
-      for (const entity of this.entities) {
-        for (const comp of entity.components) {
+      for (const entity of this.getGrandChildren()) {
+        for (const comp of entity.components ?? []) {
           comp.onAddedToHierarchy();
         }
       }
@@ -79,7 +120,23 @@ export type EntityDescriptor = {
 let entityCount = 0;
 
 export class Entity extends EntityContainer {
+  get parent() {
+    return this._parent;
+  }
 
+  set parent(parent: EntityContainer | undefined) {
+    if (parent === this._parent) {
+      return;
+    }
+
+    this._parent = parent;
+
+    if (parent && this.application) {
+      this.components.forEach(c => c.onAddedToHierarchy());
+    } else if (!parent) {
+      this.components.forEach(c => c.onRemovedFromHierarchy());
+    }
+  }
 
   static fromDescriptor({
     id,
@@ -105,12 +162,20 @@ export class Entity extends EntityContainer {
     } as EntityDescriptor;
   }
   #components: Component[] = [];
+  #componentsObservers: Observer<Component>[] = [];
   #componentsProxy = new Proxy(this.#components, {
     deleteProperty: (target, property) => {
       const component = target[property as any];
+
+      for (const observer of this.#componentsObservers) {
+        observer.deleteProperty?.(target, property);
+      }
+
+      component.onRemovedFromHierarchy();
+
       delete target[property as any];
       component.entity = undefined;
-      component.destroy?.();
+
       return true;
     },
     set: (target, property, value) => {
@@ -122,9 +187,25 @@ export class Entity extends EntityContainer {
           value.onAddedToHierarchy();
         }
       }
+      for (const observer of this.#componentsObservers) {
+        observer.set?.(target, property, value);
+      }
       return true;
     },
   });
+
+  observeComponents(observer: Observer<Component>) {
+    this.#componentsObservers.push(observer);
+    return this;
+  }
+
+  unobserveComponents(observer: Observer<Component>) {
+    const index = this.#componentsObservers.indexOf(observer);
+    if (index > -1) {
+      this.#componentsObservers.splice(index, 1);
+    }
+    return this;
+  }
 
   constructor(
     public readonly id: string,

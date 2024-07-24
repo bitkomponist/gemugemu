@@ -100,10 +100,21 @@ export abstract class Component {
     return this.entity.requireSystem(ctor);
   }
 
+  private initialized: boolean = false;
+
   onAddedToHierarchy() {
+    if (this.initialized) {
+      return;
+    }
+    this.initialized = true;
     this.resolveSiblings();
     this.resolveEntityLookups();
     this.init?.();
+  }
+
+  onRemovedFromHierarchy() {
+    this.initialized = false;
+    this.destroy?.();
   }
 
   private resolveSiblings() {
