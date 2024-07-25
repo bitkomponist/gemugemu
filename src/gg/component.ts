@@ -15,8 +15,8 @@ export type ComponentDescriptor<T extends Component = any> = { type: string } & 
 export type ComponentType<T extends Component = Component> = new (...args: any[]) => T;
 
 const componentNameRegistry = new Map<string, ComponentType>();
-const componentRegistry = new Map<new (...args: any[]) => Component, string>();
-export function RegisteredComponent(): (target: new (...args: any[]) => Component) => void {
+const componentRegistry = new Map<ComponentType, string>();
+export function RegisteredComponent(): (target: ComponentType) => void {
   return (target) => {
     if (componentNameRegistry.has(target.name)) {
       throw new Error(`Component type ${target.name} is already registered`);

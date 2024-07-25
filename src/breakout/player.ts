@@ -1,15 +1,14 @@
 import { Component, RegisteredComponent, sibling } from '@gg/component';
 import { Shape } from '@gg/components/shape.component';
 import { Transform2d } from '@gg/components/transform-2d.component';
-import { createPrefab, Entity } from '@gg/entity';
+import { Entity } from '@gg/entity';
 import { isKeyPressed } from '@gg/keyboard';
 import { clamp, vec2 } from '@gg/math';
-import { OriginGraphPrefab } from '@gg/prefabs/origin-graph.prefab';
+import { Prefab, RegisteredPrefab } from '@gg/prefab';
+import { OriginGraph } from '@gg/prefabs/origin-graph.prefab';
 import { Renderer2d } from '@gg/systems/renderer-2d.system';
 
-export
-@RegisteredComponent()
-class BreakoutPlayerControls extends Component {
+export @RegisteredComponent() class BreakoutPlayerControls extends Component {
   @sibling(Transform2d) private transform!: Transform2d;
   private targetPosition = vec2();
   private velocity = vec2();
@@ -49,24 +48,28 @@ class BreakoutPlayerControls extends Component {
   }
 }
 
-export const BreakoutPlayerPrefab = createPrefab(() => ({
-  id: 'breakout-player',
-  components: [
-    Component.describe(Transform2d),
-    Component.describe(BreakoutPlayerControls)
-  ],
-  entities: [
-    Entity.describe({
-      id: 'player-shape',
+export @RegisteredPrefab() class BreakoutPlayer extends Prefab {
+  protected build() {
+    return {
+      id: 'breakout-player',
       components: [
-        Component.describe(Transform2d, { position: vec2(-50, -15) }),
-        Component.describe(Shape, {
-          fill: '#3333ff',
-          path: 'l 100 0 l 100 30 l 0 30 l 0 0',
-          cache: vec2(100, 30),
-        })
+        Component.describe(Transform2d),
+        Component.describe(BreakoutPlayerControls)
       ],
-    }),
-    OriginGraphPrefab(),
-  ],
-}));
+      entities: [
+        Entity.describe({
+          id: 'player-shape',
+          components: [
+            Component.describe(Transform2d, { position: vec2(-50, -15) }),
+            Component.describe(Shape, {
+              fill: '#3333ff',
+              path: 'l 100 0 l 100 30 l 0 30 l 0 0',
+              cache: vec2(100, 30),
+            })
+          ],
+        }),
+        Entity.describe({ prefab: OriginGraph.name })
+      ],
+    }
+  }
+}

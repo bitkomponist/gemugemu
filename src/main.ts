@@ -3,6 +3,7 @@ import { Application, ApplicationDescriptor } from '@gg/application';
 import { Component, RegisteredComponent, sibling } from '@gg/component';
 import { Transform3d } from '@gg/components/transform-3d.component';
 import { BoxGeometry, Mesh, MeshBasicMaterial } from 'three/src/Three.js';
+import { Breakout } from './breakout';
 import './style.css';
 
 @RegisteredComponent() class DemoCube extends Component {
@@ -65,5 +66,5 @@ export const ThreeTest: ApplicationDescriptor = {
   }
 }
 
-const app = Application.fromDescriptor(ThreeTest).start();
+const app = Application.fromDescriptor(Breakout).start();
 console.log(app);

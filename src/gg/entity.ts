@@ -1,6 +1,6 @@
-import { merge } from 'lodash';
 import { Application } from './application';
 import { Component, ComponentDescriptor } from './component';
+import { prefabNameRegistry, PrefabType } from './prefab';
 import { System } from './system';
 
 export type Observer<T extends object> = {
@@ -112,6 +112,7 @@ export class EntityContainer {
 }
 
 export type EntityDescriptor = {
+  prefab?: string | { type: string, [prop: string]: unknown };
   id?: string;
   components?: ComponentDescriptor[];
   entities?: EntityDescriptor[];
@@ -138,11 +139,35 @@ export class Entity extends EntityContainer {
     }
   }
 
+  static fromPrefab(descriptor: Exclude<EntityDescriptor['prefab'], undefined>) {
+    let Type: PrefabType | undefined;
+    let props: Record<string, unknown> = {};
+    if (typeof descriptor === 'string') {
+      Type = prefabNameRegistry.get(descriptor);
+    } else {
+      const { type: typeName, ...prefabProps } = descriptor;
+      Type = prefabNameRegistry.get(typeName);
+      props = prefabProps;
+    }
+
+    if (!Type) {
+      throw new Error(`unknown prefab type ${descriptor}`);
+    }
+    const instance = new Type();
+    return Entity.fromDescriptor(instance.describe(props));
+  }
+
   static fromDescriptor({
+    prefab,
     id,
     components: componentDescriptors,
     entities: entityDescriptors,
   }: EntityDescriptor): Entity {
+
+    if (prefab) {
+      return Entity.fromPrefab(prefab);
+    }
+
     const components =
       componentDescriptors?.map((descriptor) => {
         return Component.fromDescriptor(descriptor);
@@ -285,15 +310,4 @@ export class Entity extends EntityContainer {
     return traverse(root as Entity, path.split('/'));
 
   }
-}
-
-export function createPrefab<P extends object = any>(descriptor: (props?: P) => EntityDescriptor) {
-  return (propsWithOverrides: Partial<P> & { overrides?: Partial<EntityDescriptor> } = {}) => {
-    const { overrides, ...props } = propsWithOverrides;
-    return Entity.describe(
-      merge<EntityDescriptor, Partial<EntityDescriptor>>(
-        descriptor(props as P),
-        overrides ?? {},
-      ));
-  };
 }

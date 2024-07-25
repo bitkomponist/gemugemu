@@ -39,9 +39,9 @@ export type SystemType<T extends System = System> = new (...args: any[]) => T;
 
 const systemNameRegistry = new Map<string, SystemType>();
 
-const systemRegistry = new Map<new (...args: any[]) => System, string>();
+const systemRegistry = new Map<SystemType, string>();
 
-export function RegisteredSystem(): (target: new (...args: any[]) => System) => void {
+export function RegisteredSystem(): (target: SystemType) => void {
   return (target) => {
     if (systemNameRegistry.has(target.name)) {
       throw new Error(`System type ${target.name} is already registered`);

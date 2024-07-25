@@ -1,8 +1,9 @@
 import { Component, entityLookup, RegisteredComponent, sibling } from "@gg/component";
 import { Shape } from "@gg/components/shape.component";
 import { Transform2d } from "@gg/components/transform-2d.component";
-import { createPrefab, Entity } from "@gg/entity";
+import { Entity } from "@gg/entity";
 import { vec2 } from "@gg/math";
+import { Prefab, RegisteredPrefab } from "@gg/prefab";
 import { Renderer2d } from "@gg/systems/renderer-2d.system";
 
 export @RegisteredComponent() class BreakoutBallControl extends Component {
@@ -37,19 +38,21 @@ export @RegisteredComponent() class BreakoutBallControl extends Component {
   }
 }
 
-export const BreakoutBallPrefab = createPrefab(() => (
-  {
-    components: [
-      Component.describe(Transform2d),
-      Component.describe(BreakoutBallControl)
-    ],
-    entities: [
-      Entity.describe({
-        components: [
-          Component.describe(Transform2d, { position: vec2(-5, -5) }),
-          Component.describe(Shape, { fill: '#ff0000', path: 'l 0 10 l 10 10 l 10 0 l 0 0' })
-        ]
-      })
-    ]
+export @RegisteredPrefab() class BreakoutBall extends Prefab {
+  protected build() {
+    return {
+      components: [
+        Component.describe(Transform2d),
+        Component.describe(BreakoutBallControl)
+      ],
+      entities: [
+        Entity.describe({
+          components: [
+            Component.describe(Transform2d, { position: vec2(-5, -5) }),
+            Component.describe(Shape, { fill: '#ff0000', path: 'l 0 10 l 10 10 l 10 0 l 0 0' })
+          ]
+        })
+      ]
+    }
   }
-))
+}

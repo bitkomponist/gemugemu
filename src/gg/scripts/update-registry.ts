@@ -20,6 +20,10 @@ async function updateRegistry() {
 
   registry.push(...components);
 
+  const prefabs = await glob('./src/**/*.prefab.ts');
+
+  registry.push(...prefabs);
+
   const imports = registry.map(file => {
     const path = String(file).replace(/^\.\/src\//, '../src/').replace(/\.ts$/, '');
     return `import '${path}';`
