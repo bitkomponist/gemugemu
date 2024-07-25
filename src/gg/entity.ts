@@ -1,5 +1,6 @@
 import { Component, ComponentDescriptor } from './component';
-import { EntityContainer, Observer } from './entity-container';
+import { EntityContainer, EntityContainerItem } from './entity-container';
+import { ObservableList } from './observable-list';
 import { prefabNameRegistry, PrefabType } from './prefab';
 import { System } from './system';
 
@@ -11,6 +12,29 @@ export type EntityDescriptor = {
 };
 
 let entityCount = 0;
+
+export interface Entity {
+  /**
+   * invoked before a component will be added
+   * @param component that was will be added
+   */
+  onAddComponent?(component: Component): void;
+  /**
+   * invoked after a component was added
+   * @param component that was just added
+   */
+  onComponentAdded?(component: Component): void;
+  /**
+   * invoked before a component will be removed
+   * @param component that was will be removed
+   */
+  onRemoveComponent?(component: Component): void;
+  /**
+   * invoked after a component was removed
+   * @param component that was just removed
+   */
+  onComponentRemoved?(component: Component): void;
+}
 
 export class Entity extends EntityContainer {
   get parent() {
@@ -25,9 +49,13 @@ export class Entity extends EntityContainer {
     this._parent = parent;
 
     if (parent && this.application) {
-      this.components.forEach(c => c.onAddedToHierarchy());
+      for (const component of this.components) {
+        component.onAddedToHierarchy();
+      }
     } else if (!parent) {
-      this.components.forEach(c => c.onRemovedFromHierarchy());
+      for (const component of this.components) {
+        component.onRemovedFromHierarchy();
+      }
     }
   }
 
@@ -78,74 +106,43 @@ export class Entity extends EntityContainer {
       ...descriptor ?? {},
     } as EntityDescriptor;
   }
-  #components: Component[] = [];
-  #componentsObservers: Observer<Component>[] = [];
-  #componentsProxy = new Proxy(this.#components, {
-    deleteProperty: (target, property) => {
-      const component = target[property as any];
-
-      for (const observer of this.#componentsObservers) {
-        observer.deleteProperty?.(target, property);
-      }
-
-      component.onRemovedFromHierarchy();
-
-      delete target[property as any];
-      component.entity = undefined;
-
-      return true;
-    },
-    set: (target, property, value) => {
-      target[property as any] = value;
-      if (value instanceof Component) {
-        value.entity = this;
+  #components = new ObservableList<Component>({
+    adding: (component) => this.onAddComponent?.(component),
+    added: (component) => {
+      if (component instanceof Component) {
+        component.entity = this;
         // when already in root hierarchy, initialize
         if (this.application) {
-          value.onAddedToHierarchy();
+          component.onAddedToHierarchy();
         }
       }
-      for (const observer of this.#componentsObservers) {
-        observer.set?.(target, property, value);
-      }
-      return true;
+
+      this.onComponentAdded?.(component);
     },
+    removing: (component) => {
+      this.onRemoveComponent?.(component);
+      component.onRemovedFromHierarchy();
+      component.entity = undefined;
+    },
+    removed: (component) => this.onComponentRemoved?.(component)
   });
-
-  observeComponents(observer: Observer<Component>) {
-    this.#componentsObservers.push(observer);
-    return this;
-  }
-
-  unobserveComponents(observer: Observer<Component>) {
-    const index = this.#componentsObservers.indexOf(observer);
-    if (index > -1) {
-      this.#componentsObservers.splice(index, 1);
-    }
-    return this;
-  }
 
   constructor(
     public readonly id: string,
     components: Component[] = [],
-    entities: Entity[] = [],
+    entities: EntityContainerItem[] = [],
   ) {
     super();
-    this.entities = entities;
-    this.components = components;
+    this.entities.add(...entities);
+    this.#components.add(...components);
   }
 
   get components() {
-    return this.#componentsProxy;
-  }
-
-  set components(components: Component[]) {
-    const proxy = this.#componentsProxy;
-    proxy.splice(0, proxy.length);
-    proxy.push(...components);
+    return this.#components;
   }
 
   getComponent<T extends Component>(ctor: new (...args: any[]) => T) {
-    return this.components.find((component): component is T => component instanceof ctor);
+    return this.components.find((component): component is T => component instanceof ctor) as T | undefined;
   }
 
   requireComponent<T extends Component>(ctor: new (...args: any[]) => T) {
@@ -183,7 +180,7 @@ export class Entity extends EntityContainer {
       }
 
       for (const child of entity.entities) {
-        if (child.id === segment) {
+        if ("id" in child && child.id === segment) {
           if (!nextSegments.length) {
             return child;
           } else {

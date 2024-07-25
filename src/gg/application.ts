@@ -15,7 +15,9 @@ export class Application {
 
   static fromDescriptor({ systems = Application.DEFAULT_SYSTEMS, root: rootDescriptor }: ApplicationDescriptor) {
     const root = new EntityContainer();
-    root.entities = rootDescriptor?.entities.map((d) => Entity.fromDescriptor(d)) ?? [];
+    if (rootDescriptor) {
+      root.entities.add(...rootDescriptor.entities.map((d) => Entity.fromDescriptor(d)));
+    }
     return new Application(root, systems.map(d => System.fromDescriptor(d)));
   }
 

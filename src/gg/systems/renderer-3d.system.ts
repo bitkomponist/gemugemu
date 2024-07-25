@@ -48,17 +48,12 @@ export @RegisteredSystem() class Renderer3d extends System {
       }
     }
 
-    root.observeEntities({
-      deleteProperty: (entities, index) => {
-        removeEntityFromScene(entities[index as any]);
-      },
-      set: (_entities, _index, value) => {
-        addEntityToScene(value);
-      }
-    });
+    root.onEntityRemoved = entity => removeEntityFromScene(entity);
+    root.onEntityAdded = entity => addEntityToScene(entity);
 
-    root.entities.forEach(addEntityToScene);
-
+    for (const entity of root.entities) {
+      addEntityToScene(entity);
+    }
   }
 
   destructRoot(root: EntityContainer): void {

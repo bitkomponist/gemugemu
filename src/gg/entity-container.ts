@@ -1,9 +1,30 @@
 import { Application } from './application';
 import { Entity } from './entity';
+import { ObservableList } from './observable-list';
 
-export type Observer<T extends object> = {
-  deleteProperty?: (target: T[], property: string | symbol) => void,
-  set?: (target: T[], property: string | symbol, value: any) => void,
+export type EntityContainerItem = Entity | EntityContainer;
+
+export interface EntityContainer {
+  /**
+   * invoked before a entity will be added
+   * @param entity that was will be added
+   */
+  onAddEntity?(entity: EntityContainerItem): void;
+  /**
+   * invoked after a entity was added
+   * @param entity that was just added
+   */
+  onEntityAdded?(entity: EntityContainerItem): void;
+  /**
+   * invoked before a entity will be removed
+   * @param entity that was will be removed
+   */
+  onRemoveEntity?(entity: EntityContainerItem): void;
+  /**
+   * invoked after a entity was removed
+   * @param entity that was just removed
+   */
+  onEntityRemoved?(entity: EntityContainerItem): void;
 }
 
 export class EntityContainer {
@@ -17,53 +38,23 @@ export class EntityContainer {
     this._parent = parent;
   }
 
-  #entitiesObservers: Observer<Entity>[] = [];
   #application?: Application;
-  #entities: Entity[] = [];
-  #entitiesProxy = new Proxy(this.#entities, {
-    deleteProperty: (target, property) => {
-      const entity = target[property as any];
 
-      for (const observer of this.#entitiesObservers) {
-        observer.deleteProperty?.(target, property);
+  #entities = new ObservableList<EntityContainerItem>({
+    adding: (entity) => this.onAddEntity?.(entity),
+    added: (entity) => {
+      if (entity.parent && entity.parent !== this) {
+        throw new Error(`tried to add entity to multiple containers`);
       }
-
-      delete target[property as any];
+      entity.parent = this;
+      this.onEntityAdded?.(entity);
+    },
+    removing: (entity) => {
+      this.onRemoveEntity?.(entity);
       entity.parent = undefined;
-
-      // todo, destroy component
-      return true;
     },
-    set: (target, property, value) => {
-      target[property as any] = value;
-      if (value instanceof Entity) {
-        if (value.parent) {
-          throw new Error(`tried to add entity to multiple containers`);
-        }
-        value.parent = this;
-
-        for (const observer of this.#entitiesObservers) {
-          observer.set?.(target, property, value);
-        }
-
-        // todo, initialization;
-      }
-      return true;
-    },
+    removed: (entity) => this.onEntityRemoved?.(entity)
   });
-
-  observeEntities(observer: Observer<Entity>) {
-    this.#entitiesObservers.push(observer);
-    return this;
-  }
-
-  unobserveEntities(observer: Observer<Entity>) {
-    const index = this.#entitiesObservers.indexOf(observer);
-    if (index > -1) {
-      this.#entitiesObservers.splice(index, 1);
-    }
-    return this;
-  }
 
   set application(application: Application | undefined) {
     const prev = this.application;
@@ -78,7 +69,8 @@ export class EntityContainer {
 
     if (!prev && application) {
       for (const entity of this.getGrandChildren()) {
-        for (const comp of entity.components ?? []) {
+        if (!('components' in entity)) continue;
+        for (const comp of entity.components) {
           comp.onAddedToHierarchy();
         }
       }
@@ -90,17 +82,11 @@ export class EntityContainer {
   }
 
   get entities() {
-    return this.#entitiesProxy;
-  }
-
-  set entities(entities: Entity[]) {
-    const proxy = this.#entitiesProxy;
-    proxy.splice(0, proxy.length);
-    proxy.push(...entities);
+    return this.#entities;
   }
 
   getGrandChildren() {
-    const result: Entity[] = [];
+    const result: EntityContainerItem[] = [];
     for (const child of this.#entities) {
       result.push(child);
       result.push(...child.getGrandChildren());

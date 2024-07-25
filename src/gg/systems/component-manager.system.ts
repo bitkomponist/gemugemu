@@ -30,6 +30,10 @@ export @RegisteredSystem() class ComponentManager extends System {
     this.updateables.splice(0, this.updateables.length);
 
     for (const entity of root.getGrandChildren()) {
+      if (!("components" in entity)) {
+        continue;
+      }
+
       for (const component of entity.components) {
         if (component.update) {
           this.updateables.push(component);

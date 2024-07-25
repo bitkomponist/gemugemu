@@ -36,6 +36,9 @@ export @RegisteredSystem() class Renderer2d extends System {
     this.renderables.splice(0, this.renderables.length);
 
     for (const entity of root.getGrandChildren()) {
+      if (!("components" in entity)) {
+        continue;
+      }
       for (const component of entity.components) {
         if (component.render2d) {
           this.renderables.push(component);
