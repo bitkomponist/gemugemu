@@ -1,9 +1,9 @@
 import { Entity } from '@gg/entity';
 import { Euler, Object3D, Quaternion, Vector3Like } from 'three/src/Three.js';
-import { Component, InstantiableComponent } from '../component';
+import { Component, RegisteredComponent } from '../component';
 
 export
-@InstantiableComponent()
+@RegisteredComponent()
 class Transform3d extends Component {
   public object3d = new Object3D();
 

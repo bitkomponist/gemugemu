@@ -3,7 +3,7 @@ import { Canvas } from "../canvas";
 import { Transform2d } from "../components/transform-2d.component";
 import { EntityContainer } from "../entity";
 import { vec2 } from "../math";
-import { InstantiableSystem, System } from "../system";
+import { RegisteredSystem, System } from "../system";
 
 export interface Renderable2d {
   render2d?(renderer: Renderer2d): void;
@@ -13,7 +13,7 @@ declare module '@gg/component' {
   interface Component extends Renderable2d { }
 }
 
-export @InstantiableSystem() class Renderer2d extends System {
+export @RegisteredSystem() class Renderer2d extends System {
   private dirty = true;
   private renderables: Component[] = [];
   canvas = new Canvas({ selector: '#app', width: 1024, height: 768 });

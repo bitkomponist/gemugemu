@@ -1,10 +1,10 @@
 import { Canvas } from '../canvas';
-import { Component, InstantiableComponent } from '../component';
+import { Component, RegisteredComponent } from '../component';
 import { Vector2 } from '../math';
 import { Renderer2d } from '../systems/renderer-2d.system';
 
 export
-@InstantiableComponent()
+@RegisteredComponent()
 class Shape extends Component {
   fill?: CanvasRenderingContext2D['fillStyle'];
   stroke?: CanvasRenderingContext2D['strokeStyle'];

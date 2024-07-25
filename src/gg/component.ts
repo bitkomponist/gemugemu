@@ -3,7 +3,6 @@ import { Canvas } from './canvas';
 import { Entity } from './entity';
 import { System } from './system';
 
-
 export interface Component {
   init?(): void;
   destroy?(): void;
@@ -17,7 +16,7 @@ export type ComponentType<T extends Component = Component> = new (...args: any[]
 
 const componentNameRegistry = new Map<string, ComponentType>();
 const componentRegistry = new Map<new (...args: any[]) => Component, string>();
-export function InstantiableComponent(): (target: new (...args: any[]) => Component) => void {
+export function RegisteredComponent(): (target: new (...args: any[]) => Component) => void {
   return (target) => {
     if (componentNameRegistry.has(target.name)) {
       throw new Error(`Component type ${target.name} is already registered`);

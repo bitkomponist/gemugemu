@@ -10,7 +10,7 @@ export interface System {
 export class System {
   private _application?: Application;
 
-  get Application() {
+  get application() {
     if (!this._application) {
       throw new Error('tried to access application before proper initialization');
     }
@@ -38,8 +38,10 @@ export type SystemDescriptor<T extends System = any> = { type: string } & Partia
 export type SystemType<T extends System = System> = new (...args: any[]) => T;
 
 const systemNameRegistry = new Map<string, SystemType>();
+
 const systemRegistry = new Map<new (...args: any[]) => System, string>();
-export function InstantiableSystem(): (target: new (...args: any[]) => System) => void {
+
+export function RegisteredSystem(): (target: new (...args: any[]) => System) => void {
   return (target) => {
     if (systemNameRegistry.has(target.name)) {
       throw new Error(`System type ${target.name} is already registered`);

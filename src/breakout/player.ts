@@ -1,4 +1,4 @@
-import { Component, InstantiableComponent, sibling } from '@gg/component';
+import { Component, RegisteredComponent, sibling } from '@gg/component';
 import { Shape } from '@gg/components/shape.component';
 import { Transform2d } from '@gg/components/transform-2d.component';
 import { createPrefab, Entity } from '@gg/entity';
@@ -8,7 +8,7 @@ import { OriginGraphPrefab } from '@gg/prefabs/origin-graph.prefab';
 import { Renderer2d } from '@gg/systems/renderer-2d.system';
 
 export
-@InstantiableComponent()
+@RegisteredComponent()
 class BreakoutPlayerControls extends Component {
   @sibling(Transform2d) private transform!: Transform2d;
   private targetPosition = vec2();

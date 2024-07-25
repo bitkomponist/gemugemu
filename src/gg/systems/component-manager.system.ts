@@ -1,6 +1,6 @@
 import { Component } from "@gg/component";
 import { EntityContainer } from "../entity";
-import { InstantiableSystem, System } from "../system";
+import { RegisteredSystem, System } from "../system";
 
 export interface LifecycleComponent {
   update?(delta: number): void;
@@ -10,7 +10,7 @@ declare module '@gg/component' {
   interface Component extends LifecycleComponent { }
 }
 
-export @InstantiableSystem() class ComponentManager extends System {
+export @RegisteredSystem() class ComponentManager extends System {
   private dirty = true;
   private updateables: Component[] = [];
 

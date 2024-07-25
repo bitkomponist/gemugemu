@@ -2,9 +2,9 @@ import { Transform3d } from "@gg/components/transform-3d.component";
 import Stats from 'three/addons/libs/stats.module.js';
 import { Camera, Scene, WebGLRenderer } from "three/src/Three.js";
 import { Entity, EntityContainer } from "../entity";
-import { InstantiableSystem, System } from "../system";
+import { RegisteredSystem, System } from "../system";
 
-export @InstantiableSystem() class Renderer3d extends System {
+export @RegisteredSystem() class Renderer3d extends System {
   private scene?: Scene;
   public camera?: Camera;
   public stats: Stats = new Stats();
@@ -21,6 +21,9 @@ export @InstantiableSystem() class Renderer3d extends System {
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.container.appendChild(this.renderer.domElement);
     this.container.appendChild(this.stats.dom);
+    window.addEventListener('resize', () => {
+      this.renderer.setSize(window.innerWidth, window.innerHeight);
+    });
   }
 
   initRoot(root: EntityContainer): void {

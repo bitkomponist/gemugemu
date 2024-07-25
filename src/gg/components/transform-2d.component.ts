@@ -1,9 +1,9 @@
-import { Component, InstantiableComponent } from '../component';
+import { Component, RegisteredComponent } from '../component';
 import { Entity } from '../entity';
 import { vec2 } from '../math';
 
 export
-@InstantiableComponent()
+@RegisteredComponent()
 class Transform2d extends Component {
   position = vec2();
   scale = vec2(1, 1);

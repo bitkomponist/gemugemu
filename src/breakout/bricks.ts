@@ -1,4 +1,4 @@
-import { Component, InstantiableComponent } from '@gg/component';
+import { Component, RegisteredComponent } from '@gg/component';
 import { Shape } from '@gg/components/shape.component';
 import { Transform2d } from '@gg/components/transform-2d.component';
 import { createPrefab, Entity } from '@gg/entity';
@@ -29,7 +29,7 @@ const BrickPrefab = createPrefab(
 );
 
 export
-@InstantiableComponent()
+@RegisteredComponent()
 class BreakoutBricksGrid extends Component {
   rows = 5;
   cols = 5;
