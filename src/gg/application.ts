@@ -1,5 +1,6 @@
 import '@gg/registry';
-import { Entity, EntityContainer, EntityDescriptor } from './entity';
+import { Entity, EntityDescriptor } from './entity';
+import { EntityContainer } from './entity-container';
 import { System, SystemDescriptor } from './system';
 import { ComponentManager } from './systems/component-manager.system';
 

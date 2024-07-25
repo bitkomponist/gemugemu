@@ -1,7 +1,8 @@
 import { Transform3d } from "@gg/components/transform-3d.component";
 import Stats from 'three/addons/libs/stats.module.js';
 import { Camera, Scene, WebGLRenderer } from "three/src/Three.js";
-import { Entity, EntityContainer } from "../entity";
+import { Entity } from "../entity";
+import { EntityContainer } from "../entity-container";
 import { RegisteredSystem, System } from "../system";
 
 export @RegisteredSystem() class Renderer3d extends System {

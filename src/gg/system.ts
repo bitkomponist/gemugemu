@@ -1,5 +1,5 @@
 import { Application } from "./application";
-import { EntityContainer } from "./entity";
+import { EntityContainer } from "./entity-container";
 
 export interface System {
   initRoot?(root: EntityContainer): void;

@@ -1,5 +1,5 @@
 import { Component } from "@gg/component";
-import { EntityContainer } from "../entity";
+import { EntityContainer } from "../entity-container";
 import { RegisteredSystem, System } from "../system";
 
 export interface LifecycleComponent {

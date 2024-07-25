@@ -1,7 +1,7 @@
 import { Component } from "@gg/component";
 import { Canvas } from "../canvas";
 import { Transform2d } from "../components/transform-2d.component";
-import { EntityContainer } from "../entity";
+import { EntityContainer } from "../entity-container";
 import { vec2 } from "../math";
 import { RegisteredSystem, System } from "../system";
 
@@ -16,7 +16,7 @@ declare module '@gg/component' {
 export @RegisteredSystem() class Renderer2d extends System {
   private dirty = true;
   private renderables: Component[] = [];
-  canvas = new Canvas({ selector: '#app', width: 1024, height: 768 });
+  canvas = new Canvas({ selector: '#app', width: 800, height: 600 });
 
   get viewport() {
     return vec2(this.canvas.width, this.canvas.height);
