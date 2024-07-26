@@ -1,5 +1,5 @@
 import { Entity } from '@gg/entity';
-import { Euler, Object3D, Quaternion, Vector3Like } from 'three/src/Three.js';
+import { Euler, Object3D, Quaternion, Vector3, Vector3Like } from 'three/src/Three.js';
 import { Component, RegisteredComponent } from '../component';
 
 export
@@ -7,7 +7,7 @@ export
 class Transform extends Component {
   public object3d = new Object3D();
 
-  get position() {
+  get position(): Vector3 {
     return this.object3d.position;
   }
 

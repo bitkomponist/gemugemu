@@ -1,13 +1,10 @@
 
-import { Canvas } from './canvas';
 import { Entity } from './entity';
 import { System } from './system';
 
 export interface Component {
   init?(): void;
   destroy?(): void;
-  update?(delta: number): void;
-  render?(canvas: Canvas): void;
 }
 
 export type ComponentDescriptor<T extends Component = any> = { type: string } & Partial<T>;

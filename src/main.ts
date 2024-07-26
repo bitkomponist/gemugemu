@@ -1,4 +1,4 @@
-import { initDogeCloud } from './examples/doge-cloud';
+import { initPong } from './examples/pong';
 import './style.css';
 
-console.log(initDogeCloud());
+console.log(initPong());

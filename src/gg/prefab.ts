@@ -5,10 +5,21 @@ export abstract class Prefab<P extends object = any> {
   protected abstract build(props?: P): EntityDescriptor;
   describe(propsWithOverrides: Partial<P> & { overrides?: Partial<EntityDescriptor> } = {}) {
     const { overrides, ...props } = propsWithOverrides;
+    const descriptor = this.build(props as P);
     return Entity.describe(
       merge<EntityDescriptor, Partial<EntityDescriptor>>(
-        this.build(props as P),
-        overrides ?? {},
+        descriptor,
+        {
+          ...overrides ?? {},
+          components: [
+            ...descriptor.components ?? [],
+            ...overrides?.components ?? []
+          ],
+          entities: [
+            ...descriptor.entities ?? [],
+            ...overrides?.entities ?? []
+          ]
+        }
       ));
   }
 }
