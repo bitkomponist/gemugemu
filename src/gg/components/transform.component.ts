@@ -4,7 +4,7 @@ import { Component, RegisteredComponent } from '../component';
 
 export
 @RegisteredComponent()
-class Transform3d extends Component {
+class Transform extends Component {
   public object3d = new Object3D();
 
   get position() {
@@ -44,7 +44,7 @@ class Transform3d extends Component {
 
     if (!this.entity.parent || !(this.entity.parent instanceof Entity)) return;
 
-    const parentTransform = this.entity.parent.getComponent(Transform3d);
+    const parentTransform = this.entity.parent.getComponent(Transform);
 
     if (parentTransform?.object3d) {
       parentTransform.object3d.add(this.object3d);

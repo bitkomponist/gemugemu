@@ -1,14 +1,14 @@
 import { Application } from '@gg/application';
 import { Component, RegisteredComponent, sibling } from '@gg/component';
-import { Transform3d } from '@gg/components/transform-3d.component';
+import { Transform } from '@gg/components/transform.component';
 import { Entity } from '@gg/entity';
-import { Renderer3d } from '@gg/systems/renderer-3d.system';
+import { Renderer } from '@gg/systems/renderer.system';
 import { Fog } from 'three/src/Three.js';
 import doge from '~/assets/doge.png';
 
 
 @RegisteredComponent() export class LinearRotation extends Component {
-  @sibling(Transform3d) private transform!: Transform3d;
+  @sibling(Transform) private transform!: Transform;
 
   update(delta: number) {
     this.transform.rotation.x += delta * 0.001;
@@ -21,15 +21,15 @@ import doge from '~/assets/doge.png';
   init() {
     const cubes: Entity[] = [];
 
-    const { scene } = this.requireSystem(Renderer3d);
+    const { scene } = this.requireSystem(Renderer);
 
     scene.fog = new Fog(0x000000, 2, 8);
 
     const spawnDespawn = () => {
       const cube = Entity.fromDescriptor({
         components: [
-          { type: 'Transform3d', scale: { x: .25, y: .25, z: .25 }, position: { x: -4 + Math.random() * 8, y: -4 + Math.random() * 8, z: -4 + Math.random() * 8 } },
-          { type: 'Sprite3d', texturePath: doge }
+          { type: 'Transform', scale: { x: .25, y: .25, z: .25 }, position: { x: -4 + Math.random() * 8, y: -4 + Math.random() * 8, z: -4 + Math.random() * 8 } },
+          { type: 'Sprite', texturePath: doge }
         ]
       });
 
@@ -53,27 +53,27 @@ export const initDogeCloud = () => Application.fromDescriptor({
     entities: [
       {
         id: 'camera', components: [
-          { type: 'Transform3d', position: { x: 0, y: 0, z: 5 } },
-          { type: 'Camera3d' }
+          { type: 'Transform', position: { x: 0, y: 0, z: 5 } },
+          { type: 'Camera' }
         ]
       },
       {
         id: 'parent',
         components: [
-          { type: 'Transform3d' },
+          { type: 'Transform' },
           { type: 'LinearRotation' }
         ],
         entities: [
           {
             id: 'child',
             components: [
-              { type: 'Transform3d', position: { x: 1.5, y: 0, z: 0 } },
+              { type: 'Transform', position: { x: 1.5, y: 0, z: 0 } },
             ],
             entities: [
               {
                 id: 'grandchild',
                 components: [
-                  { type: 'Transform3d', position: { x: -1.5, y: 0, z: 0 } },
+                  { type: 'Transform', position: { x: -1.5, y: 0, z: 0 } },
                   { type: 'EmitDogesOverTime' }
                 ]
               }

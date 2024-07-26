@@ -20,7 +20,7 @@ export @RegisteredSystem() class ResourceManager extends System {
    * @param total The total amount of items to be loaded.
    */
   private onProgress(url: string, loaded: number, total: number) {
-
+    // todo
   }
 
   /**
@@ -29,7 +29,7 @@ export @RegisteredSystem() class ResourceManager extends System {
    * @param url The url of the item that errored.
    */
   private onError(url: string) {
-
+    // todo
   }
 
   get loadingManager() {

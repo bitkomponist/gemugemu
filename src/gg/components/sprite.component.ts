@@ -1,14 +1,14 @@
 import { Component, RegisteredComponent, sibling } from "@gg/component";
 import { ResourceManager } from "@gg/systems/resource-manager.system";
-import { Sprite, SpriteMaterial } from "three/src/Three.js";
-import { Transform3d } from "./transform-3d.component";
+import { SpriteMaterial, Sprite as ThreeSprite } from "three/src/Three.js";
+import { Transform } from "./transform.component";
 
-export @RegisteredComponent() class Sprite3d extends Component {
-  sprite: Sprite = new Sprite();
+export @RegisteredComponent() class Sprite extends Component {
+  sprite: ThreeSprite = new ThreeSprite();
   spriteMaterial: SpriteMaterial = new SpriteMaterial({ color: 0xffffff, fog: true });
   texturePath?: string;
 
-  @sibling(Transform3d) transform!: Transform3d;
+  @sibling(Transform) transform!: Transform;
 
   async loadTexture(path: string, onProgress?: (event: ProgressEvent) => void) {
     const map = await this.requireSystem(ResourceManager).textureLoader.loadAsync(path, onProgress);

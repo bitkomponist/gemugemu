@@ -3,7 +3,7 @@ import { Entity, EntityDescriptor } from './entity';
 import { EntityContainer } from './entity-container';
 import { System, SystemDescriptor } from './system';
 import { ComponentManager } from './systems/component-manager.system';
-import { Renderer3d } from './systems/renderer-3d.system';
+import { Renderer } from './systems/renderer.system';
 import { ResourceManager } from './systems/resource-manager.system';
 
 export type ApplicationDescriptor = {
@@ -14,7 +14,7 @@ export class Application {
   static DEFAULT_SYSTEMS: SystemDescriptor[] = [
     { type: ComponentManager.name },
     { type: ResourceManager.name },
-    { type: Renderer3d.name },
+    { type: Renderer.name },
   ]
 
   static fromDescriptor({ systems = [], root: rootDescriptor }: ApplicationDescriptor) {

@@ -1,17 +1,17 @@
 import { Component, RegisteredComponent, sibling } from "@gg/component";
-import { Renderer3d } from "@gg/systems/renderer-3d.system";
+import { Renderer } from "@gg/systems/renderer.system";
 import { PerspectiveCamera, Vector2 } from "three/src/Three.js";
-import { Transform3d } from "./transform-3d.component";
+import { Transform } from "./transform.component";
 
-export @RegisteredComponent() class Camera3d extends Component {
+export @RegisteredComponent() class Camera extends Component {
   viewport = new Vector2();
 
   camera?: PerspectiveCamera;
 
-  @sibling(Transform3d) transform!: Transform3d;
+  @sibling(Transform) transform!: Transform;
 
   init(): void {
-    const renderer = this.requireSystem(Renderer3d);
+    const renderer = this.requireSystem(Renderer);
 
     renderer.renderer.getSize(this.viewport);
 
