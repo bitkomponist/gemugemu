@@ -9,7 +9,7 @@ export @RegisteredSystem() class ResourceManager extends System {
    * The default is a function with empty body.
    */
   private onLoad() {
-    console.log('resources loaded');
+
   }
 
   /**

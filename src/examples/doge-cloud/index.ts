@@ -49,11 +49,6 @@ import doge from '~/assets/doge.png';
 
 
 export const initDogeCloud = () => Application.fromDescriptor({
-  systems: [
-    { type: 'ComponentManager' },
-    { type: 'ResourceManager' },
-    { type: 'Renderer3d' },
-  ],
   root: {
     entities: [
       {

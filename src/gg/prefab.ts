@@ -30,16 +30,3 @@ export function RegisteredPrefab(): (target: PrefabType) => void {
     prefabRegistry.set(target, target.name);
   };
 }
-
-interface MyPrefabParams {
-  foo?: string;
-  bar?: string;
-}
-
-@RegisteredPrefab() class MyPrefab extends Prefab {
-  build(params: MyPrefabParams): EntityDescriptor {
-    return {
-      components: []
-    }
-  }
-}

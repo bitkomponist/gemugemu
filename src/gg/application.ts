@@ -3,6 +3,8 @@ import { Entity, EntityDescriptor } from './entity';
 import { EntityContainer } from './entity-container';
 import { System, SystemDescriptor } from './system';
 import { ComponentManager } from './systems/component-manager.system';
+import { Renderer3d } from './systems/renderer-3d.system';
+import { ResourceManager } from './systems/resource-manager.system';
 
 export type ApplicationDescriptor = {
   systems?: SystemDescriptor[];
@@ -11,14 +13,16 @@ export type ApplicationDescriptor = {
 export class Application {
   static DEFAULT_SYSTEMS: SystemDescriptor[] = [
     { type: ComponentManager.name },
+    { type: ResourceManager.name },
+    { type: Renderer3d.name },
   ]
 
-  static fromDescriptor({ systems = Application.DEFAULT_SYSTEMS, root: rootDescriptor }: ApplicationDescriptor) {
+  static fromDescriptor({ systems = [], root: rootDescriptor }: ApplicationDescriptor) {
     const root = new EntityContainer();
     if (rootDescriptor) {
       root.entities.add(...rootDescriptor.entities.map((d) => Entity.fromDescriptor(d)));
     }
-    return new Application(root, systems.map(d => System.fromDescriptor(d)));
+    return new Application(root, [...Application.DEFAULT_SYSTEMS, ...systems].map(d => System.fromDescriptor(d)));
   }
 
   #root?: EntityContainer;
