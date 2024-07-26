@@ -6,9 +6,13 @@ import { EntityContainer } from "../entity-container";
 import { RegisteredSystem, System } from "../system";
 
 export @RegisteredSystem() class Renderer3d extends System {
-  private scene?: Scene;
+  private _scene: Scene = new Scene();
   public camera?: Camera;
   public stats: Stats = new Stats();
+
+  public get scene() {
+    return this._scene;
+  }
 
   renderer = new WebGLRenderer({ antialias: true })
 
@@ -28,7 +32,10 @@ export @RegisteredSystem() class Renderer3d extends System {
   }
 
   initRoot(root: EntityContainer): void {
-    const scene = this.scene = new Scene();
+    const { scene } = this;
+    while (scene.children.length) {
+      scene.remove(scene.children[0]);
+    }
 
     function addEntityToScene(entity: Entity | EntityContainer) {
       if (entity instanceof Entity) {
@@ -61,8 +68,8 @@ export @RegisteredSystem() class Renderer3d extends System {
   }
 
   updateRoot(): void {
-    if (this.scene && this.camera) {
-      this.renderer.render(this.scene, this.camera);
+    if (this._scene && this.camera) {
+      this.renderer.render(this._scene, this.camera);
     }
     this.stats.update();
   }

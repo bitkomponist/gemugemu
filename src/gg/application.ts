@@ -23,12 +23,16 @@ export class Application {
 
   #root?: EntityContainer;
 
-  constructor(root?: EntityContainer, public systems?: System[]) {
+  constructor(root?: EntityContainer, public systems?: System[], autostart = true) {
     this.systems?.forEach(system => {
       system.application = this;
     });
 
     this.root = root;
+
+    if (root && autostart) {
+      this.start();
+    }
   }
 
   set root(root: EntityContainer | undefined) {

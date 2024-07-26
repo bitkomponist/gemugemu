@@ -49,7 +49,7 @@ class BreakoutBricksGrid extends Component {
         const brickTransform2d = brick.requireComponent(Transform2d);
         brickTransform2d.position.x = offsetX + x * (this.brickSize.x + this.gap);
         brickTransform2d.position.y = this.offsetY + y * (this.brickSize.y + this.gap);
-        this.entity.entities.push(brick);
+        this.entity.entities.add(brick);
       }
     }
   }
