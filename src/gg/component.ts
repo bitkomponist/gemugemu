@@ -1,7 +1,8 @@
 import { Entity } from './entity';
 import { System } from './system';
 
-export type ComponentDescriptor<T extends Component = Component> = { type: string } & Partial<T>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ComponentDescriptor<T extends Component = any> = { type: string } & Partial<T>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ComponentType<T extends Component = Component> = new (...args: any[]) => T;

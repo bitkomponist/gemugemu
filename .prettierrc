@@ -2,14 +2,20 @@
   "singleQuote": true,
   "overrides": [
     {
-      "files": ["**/*.css", "**/*.scss", "**/*.html"],
+      "files": [
+        "**/*.css",
+        "**/*.scss",
+        "**/*.html"
+      ],
       "options": {
         "singleQuote": false,
         "printWidth": 80
       }
     },
     {
-      "files": ["**/*.json"],
+      "files": [
+        "**/*.json"
+      ],
       "options": {
         "singleQuote": false,
         "printWidth": 20
@@ -17,5 +23,10 @@
     }
   ],
   "printWidth": 100,
-  "singleAttributePerLine": true
+  "singleAttributePerLine": true,
+  "plugins": [
+    "prettier-plugin-jsdoc"
+  ],
+  "tsdoc": true,
+  "jsdocPreferCodeFences": true
 }

@@ -6,17 +6,32 @@ import { ComponentManager } from './systems/component-manager.system';
 import { Renderer } from './systems/renderer.system';
 import { ResourceManager } from './systems/resource-manager.system';
 
-/**
- * interface with properties necessary to instantiate a application object
- */
+/** Interface with properties necessary to instantiate a application object */
 export type ApplicationDescriptor = {
   systems?: SystemDescriptor[];
   root?: { entities: EntityDescriptor[] };
 };
+
+/**
+ * All encompassing application object, acts as global state for your game and controls the update
+ * loop
+ *
+ * @example
+ *
+ * ```
+ * const myApp = Application.fromDescriptor({
+ *   systems: [{ type: 'MyCustomSystem' }],
+ *   entities: [
+ *     {
+ *       id: 'myEntity',
+ *       components: [{ type: 'GreeterComponent', message: 'Hello World' }],
+ *     },
+ *   ],
+ * });
+ * ```
+ */
 export class Application {
-  /**
-   * Default systems, which should be present in every application
-   */
+  /** Default systems, which should be present in every application */
   static DEFAULT_SYSTEMS: SystemDescriptor[] = [
     { type: ComponentManager.name },
     { type: ResourceManager.name },
@@ -25,6 +40,7 @@ export class Application {
 
   /**
    * Create Application from a ApplicationDescriptor object
+   *
    * @param descriptor - ApplicationDescriptor object
    * @returns Application
    */
@@ -39,10 +55,10 @@ export class Application {
     );
   }
 
-  /** internal reference to the current root container */
+  /** Internal reference to the current root container */
   private _root?: EntityContainer;
 
-  /** sets the current root container and initializes the app's systems with it */
+  /** Sets the current root container and initializes the app's systems with it */
   set root(root: EntityContainer | undefined) {
     this._root = root;
     if (root) {
@@ -53,16 +69,17 @@ export class Application {
     }
   }
 
-  /** get the current root container */
+  /** Get the current root container */
   get root() {
     return this._root;
   }
 
   /**
    * Creates a new instance of Application
-   * @param root - container with elements to construct the scene
-   * @param systems - to be used by the application (default systems are also added)
-   * @param autostart - if a root container was provided, start the application immediately
+   *
+   * @param root - Container with elements to construct the scene
+   * @param systems - To be used by the application (default systems are also added)
+   * @param autostart - If a root container was provided, start the application immediately
    */
   constructor(
     root?: EntityContainer,
@@ -80,15 +97,16 @@ export class Application {
     }
   }
 
-  /** reference to the animation frame callback that runs next */
+  /** Reference to the animation frame callback that runs next */
   private currentAnimationFrame?: number;
 
-  /** timestamp of the last executed animation frame */
+  /** Timestamp of the last executed animation frame */
   private lastTime = 0;
 
   /**
-   * starts the application update loop
-   * @returns this application
+   * Starts the application update loop
+   *
+   * @returns This application
    */
   start() {
     this.currentAnimationFrame = requestAnimationFrame(this.onAnimationFrame);
@@ -96,8 +114,9 @@ export class Application {
   }
 
   /**
-   * destroys the current root and stops the update loop
-   * @returns this application
+   * Destroys the current root and stops the update loop
+   *
+   * @returns This application
    */
   stop() {
     if (this.root) {
@@ -114,7 +133,8 @@ export class Application {
   }
 
   /**
-   * update function that runs each animation frame
+   * Update function that runs each animation frame
+   *
    * @param time - DOMHighResTimeStamp
    */
   private onAnimationFrame: FrameRequestCallback = (time) => {
