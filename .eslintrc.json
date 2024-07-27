@@ -5,6 +5,16 @@
   "root": true,
   "plugins": [
     "prettier",
-    "@typescript-eslint"
-  ]
+    "@typescript-eslint",
+    "eslint-plugin-tsdoc"
+  ],
+  "parserOptions": {
+    "project": "./tsconfig.json",
+    "tsconfigRootDir": ".",
+    "ecmaVersion": 2022,
+    "sourceType": "module"
+  },
+  "rules": {
+    "tsdoc/syntax": "warn"
+  }
 }
