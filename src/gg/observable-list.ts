@@ -1,16 +1,18 @@
-
 export type ListObserver<T = any> = {
   adding?(item: T, target: ObservableList<T>): void;
   added?(item: T, target: ObservableList<T>): void;
   removing?(item: T, target: ObservableList<T>): void;
   removed?(item: T, target: ObservableList<T>): void;
-}
+};
 
 export class ObservableList<T = any> {
   private items: T[] = [];
 
-
-  constructor(private observer?: ListObserver<T>, initialItems: T[] = [], private distinct = true) {
+  constructor(
+    private observer?: ListObserver<T>,
+    initialItems: T[] = [],
+    private distinct = true,
+  ) {
     for (const item of initialItems) {
       this.add(item);
     }
@@ -85,7 +87,7 @@ export class ObservableList<T = any> {
     const { items } = this;
 
     return {
-      next: () => ({ value: items[++index], done: !(index in items) })
+      next: () => ({ value: items[++index], done: !(index in items) }),
     };
-  };
+  }
 }

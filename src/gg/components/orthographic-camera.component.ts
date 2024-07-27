@@ -1,9 +1,11 @@
-import { Component, RegisteredComponent, sibling } from "@gg/component";
-import { Renderer } from "@gg/systems/renderer.system";
-import { OrthographicCamera as ThreeOrthographicCamera, Vector2 } from "three/src/Three.js";
-import { Transform } from "./transform.component";
+import { Component, RegisteredComponent, sibling } from '@gg/component';
+import { Renderer } from '@gg/systems/renderer.system';
+import { OrthographicCamera as ThreeOrthographicCamera, Vector2 } from 'three/src/Three.js';
+import { Transform } from './transform.component';
 
-export @RegisteredComponent() class OrthographicCamera extends Component {
+export
+@RegisteredComponent()
+class OrthographicCamera extends Component {
   private _viewport = new Vector2(window.innerWidth, window.innerHeight);
 
   get viewport() {
@@ -22,7 +24,7 @@ export @RegisteredComponent() class OrthographicCamera extends Component {
     this.updateCameraProjection();
   }
 
-  private _near: number = .1;
+  private _near: number = 0.1;
 
   get near() {
     return this._near;
@@ -31,7 +33,7 @@ export @RegisteredComponent() class OrthographicCamera extends Component {
   set near(near: number) {
     this._near = near;
 
-    if (this.camera && "near" in this.camera) {
+    if (this.camera && 'near' in this.camera) {
       this.camera.near = this._near;
       this.updateCameraProjection();
     }
@@ -46,7 +48,7 @@ export @RegisteredComponent() class OrthographicCamera extends Component {
   set far(far: number) {
     this._far = far;
 
-    if (this.camera && "far" in this.camera) {
+    if (this.camera && 'far' in this.camera) {
       this.camera.far = this._far;
       this.updateCameraProjection();
     }
@@ -58,7 +60,7 @@ export @RegisteredComponent() class OrthographicCamera extends Component {
     1,
     -1,
     this._near,
-    this._far
+    this._far,
   );
 
   get camera() {
@@ -71,10 +73,10 @@ export @RegisteredComponent() class OrthographicCamera extends Component {
     const { camera, frustumSize } = this;
     const aspect = this._viewport.x / this._viewport.y;
 
-    camera.left = - frustumSize * aspect / 2;
-    camera.right = frustumSize * aspect / 2;
+    camera.left = (-frustumSize * aspect) / 2;
+    camera.right = (frustumSize * aspect) / 2;
     camera.top = frustumSize / 2;
-    camera.bottom = - frustumSize / 2;
+    camera.bottom = -frustumSize / 2;
 
     this.camera.updateProjectionMatrix();
   }
@@ -86,7 +88,7 @@ export @RegisteredComponent() class OrthographicCamera extends Component {
     const resize = () => {
       renderer.renderer.getSize(this.viewport);
       this.updateCameraProjection();
-    }
+    };
     window.addEventListener('resize', resize);
     resize();
   }

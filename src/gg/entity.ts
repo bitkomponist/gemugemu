@@ -5,7 +5,7 @@ import { prefabNameRegistry, PrefabType } from './prefab';
 import { System } from './system';
 
 export type EntityDescriptor = {
-  prefab?: string | { type: string, [prop: string]: unknown };
+  prefab?: string | { type: string; [prop: string]: unknown };
   id?: string;
   components?: ComponentDescriptor[];
   entities?: EntityDescriptor[];
@@ -83,7 +83,6 @@ export class Entity extends EntityContainer {
     components: componentDescriptors,
     entities: entityDescriptors,
   }: EntityDescriptor): Entity {
-
     if (prefab) {
       return Entity.fromPrefab(prefab);
     }
@@ -103,7 +102,7 @@ export class Entity extends EntityContainer {
 
   static describe(descriptor?: EntityDescriptor) {
     return {
-      ...descriptor ?? {},
+      ...(descriptor ?? {}),
     } as EntityDescriptor;
   }
   #components = new ObservableList<Component>({
@@ -124,7 +123,7 @@ export class Entity extends EntityContainer {
       component.onRemovedFromHierarchy();
       component.entity = undefined;
     },
-    removed: (component) => this.onComponentRemoved?.(component)
+    removed: (component) => this.onComponentRemoved?.(component),
   });
 
   constructor(
@@ -142,7 +141,9 @@ export class Entity extends EntityContainer {
   }
 
   getComponent<T extends Component>(ctor: new (...args: any[]) => T) {
-    return this.components.find((component): component is T => component instanceof ctor) as T | undefined;
+    return this.components.find((component): component is T => component instanceof ctor) as
+      | T
+      | undefined;
   }
 
   requireComponent<T extends Component>(ctor: new (...args: any[]) => T) {
@@ -180,7 +181,7 @@ export class Entity extends EntityContainer {
       }
 
       for (const child of entity.entities) {
-        if ("id" in child && child.id === segment) {
+        if ('id' in child && child.id === segment) {
           if (!nextSegments.length) {
             return child;
           } else {
@@ -197,6 +198,5 @@ export class Entity extends EntityContainer {
     let root = relative ? this : this.application?.root;
 
     return traverse(root as Entity, path.split('/'));
-
   }
 }

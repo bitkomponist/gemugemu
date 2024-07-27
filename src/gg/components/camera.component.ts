@@ -1,16 +1,18 @@
-import { Component, RegisteredComponent, sibling } from "@gg/component";
-import { Renderer } from "@gg/systems/renderer.system";
-import { PerspectiveCamera, Vector2 } from "three/src/Three.js";
-import { Transform } from "./transform.component";
+import { Component, RegisteredComponent, sibling } from '@gg/component';
+import { Renderer } from '@gg/systems/renderer.system';
+import { PerspectiveCamera, Vector2 } from 'three/src/Three.js';
+import { Transform } from './transform.component';
 
-export @RegisteredComponent() class Camera extends Component {
+export
+@RegisteredComponent()
+class Camera extends Component {
   private _viewport = new Vector2(1, 1);
 
   get viewport() {
     return this._viewport;
   }
 
-  private _near: number = .1;
+  private _near: number = 0.1;
 
   get near() {
     return this._near;
@@ -19,7 +21,7 @@ export @RegisteredComponent() class Camera extends Component {
   set near(near: number) {
     this._near = near;
 
-    if (this.camera && "near" in this.camera) {
+    if (this.camera && 'near' in this.camera) {
       this.camera.near = this._near;
       this.updateCameraProjection();
     }
@@ -34,7 +36,7 @@ export @RegisteredComponent() class Camera extends Component {
   set far(far: number) {
     this._far = far;
 
-    if (this.camera && "far" in this.camera) {
+    if (this.camera && 'far' in this.camera) {
       this.camera.far = this._far;
       this.updateCameraProjection();
     }
@@ -49,7 +51,7 @@ export @RegisteredComponent() class Camera extends Component {
   set fov(fov: number) {
     this._fov = fov;
 
-    if (this.camera && "fov" in this.camera) {
+    if (this.camera && 'fov' in this.camera) {
       this.camera.fov = this._fov;
       this.updateCameraProjection();
     }
@@ -78,7 +80,7 @@ export @RegisteredComponent() class Camera extends Component {
     const resize = () => {
       renderer.renderer.getSize(this.viewport);
       this.updateCameraProjection();
-    }
+    };
 
     window.addEventListener('resize', resize);
 

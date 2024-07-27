@@ -1,8 +1,10 @@
-import { Component, RegisteredComponent, sibling } from "@gg/component";
-import { CanvasTexture } from "three/src/Three.js";
-import { Sprite } from "./sprite.component";
+import { Component, RegisteredComponent, sibling } from '@gg/component';
+import { CanvasTexture } from 'three/src/Three.js';
+import { Sprite } from './sprite.component';
 
-export @RegisteredComponent() class CanvasSprite extends Component {
+export
+@RegisteredComponent()
+class CanvasSprite extends Component {
   private _size = 128;
   get size() {
     return this._size;

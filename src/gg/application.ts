@@ -15,20 +15,27 @@ export class Application {
     { type: ComponentManager.name },
     { type: ResourceManager.name },
     { type: Renderer.name },
-  ]
+  ];
 
   static fromDescriptor({ systems = [], root: rootDescriptor }: ApplicationDescriptor) {
     const root = new EntityContainer();
     if (rootDescriptor) {
       root.entities.add(...rootDescriptor.entities.map((d) => Entity.fromDescriptor(d)));
     }
-    return new Application(root, [...Application.DEFAULT_SYSTEMS, ...systems].map(d => System.fromDescriptor(d)));
+    return new Application(
+      root,
+      [...Application.DEFAULT_SYSTEMS, ...systems].map((d) => System.fromDescriptor(d)),
+    );
   }
 
   #root?: EntityContainer;
 
-  constructor(root?: EntityContainer, public systems?: System[], autostart = true) {
-    this.systems?.forEach(system => {
+  constructor(
+    root?: EntityContainer,
+    public systems?: System[],
+    autostart = true,
+  ) {
+    this.systems?.forEach((system) => {
       system.application = this;
     });
 
@@ -43,9 +50,9 @@ export class Application {
     this.#root = root;
     if (root) {
       root.application = this;
-      this.systems?.forEach(sys => {
+      this.systems?.forEach((sys) => {
         sys.initRoot?.(root);
-      })
+      });
     }
   }
 
@@ -64,9 +71,9 @@ export class Application {
   stop() {
     if (this.root) {
       const { root } = this;
-      this.systems?.forEach(sys => {
+      this.systems?.forEach((sys) => {
         sys.destructRoot?.(root);
-      })
+      });
     }
     if (!this.currentAnimationFrame) {
       return this;
@@ -80,13 +87,12 @@ export class Application {
 
     if (this.root) {
       const { root } = this;
-      this.systems?.forEach(sys => {
+      this.systems?.forEach((sys) => {
         sys.updateRoot?.(root, delta);
-      })
+      });
     }
 
     this.lastTime = time;
     this.currentAnimationFrame = requestAnimationFrame(this.tick);
   };
-
 }

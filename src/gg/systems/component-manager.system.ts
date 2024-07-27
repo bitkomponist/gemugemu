@@ -1,16 +1,18 @@
-import { Component } from "@gg/component";
-import { EntityContainer } from "../entity-container";
-import { RegisteredSystem, System } from "../system";
+import { Component } from '@gg/component';
+import { EntityContainer } from '../entity-container';
+import { RegisteredSystem, System } from '../system';
 
 export interface LifecycleComponent {
   update?(delta: number): void;
 }
 
 declare module '@gg/component' {
-  interface Component extends LifecycleComponent { }
+  interface Component extends LifecycleComponent {}
 }
 
-export @RegisteredSystem() class ComponentManager extends System {
+export
+@RegisteredSystem()
+class ComponentManager extends System {
   private dirty = true;
   private updateables: Component[] = [];
 
@@ -30,7 +32,7 @@ export @RegisteredSystem() class ComponentManager extends System {
     this.updateables.splice(0, this.updateables.length);
 
     for (const entity of root.getGrandChildren()) {
-      if (!("components" in entity)) {
+      if (!('components' in entity)) {
         continue;
       }
 
@@ -43,5 +45,4 @@ export @RegisteredSystem() class ComponentManager extends System {
 
     this.dirty = false;
   }
-
 }

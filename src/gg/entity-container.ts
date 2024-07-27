@@ -53,7 +53,7 @@ export class EntityContainer {
       this.onRemoveEntity?.(entity);
       entity.parent = undefined;
     },
-    removed: (entity) => this.onEntityRemoved?.(entity)
+    removed: (entity) => this.onEntityRemoved?.(entity),
   });
 
   set application(application: Application | undefined) {

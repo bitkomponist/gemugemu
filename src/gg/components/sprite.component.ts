@@ -1,9 +1,11 @@
-import { Component, RegisteredComponent, sibling } from "@gg/component";
-import { ResourceManager } from "@gg/systems/resource-manager.system";
-import { SpriteMaterial, Texture, Sprite as ThreeSprite } from "three/src/Three.js";
-import { Transform } from "./transform.component";
+import { Component, RegisteredComponent, sibling } from '@gg/component';
+import { ResourceManager } from '@gg/systems/resource-manager.system';
+import { SpriteMaterial, Texture, Sprite as ThreeSprite } from 'three/src/Three.js';
+import { Transform } from './transform.component';
 
-export @RegisteredComponent() class Sprite extends Component {
+export
+@RegisteredComponent()
+class Sprite extends Component {
   sprite: ThreeSprite = new ThreeSprite();
   spriteMaterial: SpriteMaterial = new SpriteMaterial({ color: 0xffffff, fog: true });
   texturePath?: string;

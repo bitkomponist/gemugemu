@@ -1,4 +1,3 @@
-
 import { Entity } from './entity';
 import { System } from './system';
 
@@ -47,7 +46,7 @@ export function sibling(type: ComponentType): PropertyDecorator {
       siblingMap.set(target, new Map());
     }
     siblingMap.get(target)?.set(key, type);
-  }
+  };
 }
 
 const entityLookupMap = new Map<Object, Map<string | symbol, string>>();
@@ -59,7 +58,7 @@ export function entityLookup(path: string): PropertyDecorator {
       entityLookupMap.set(target, new Map());
     }
     entityLookupMap.get(target)?.set(key, path);
-  }
+  };
 }
 
 export abstract class Component {
@@ -67,10 +66,13 @@ export abstract class Component {
     return getComponentInstanceById<T>(id, props as Partial<T>);
   }
 
-  static describe<T extends Component = any>(type: ComponentType<T>, descriptor?: Omit<ComponentDescriptor<T>, 'type'>) {
+  static describe<T extends Component = any>(
+    type: ComponentType<T>,
+    descriptor?: Omit<ComponentDescriptor<T>, 'type'>,
+  ) {
     return {
-      ...descriptor ?? {},
-      type: type.name
+      ...(descriptor ?? {}),
+      type: type.name,
     } as ComponentDescriptor<T>;
   }
 

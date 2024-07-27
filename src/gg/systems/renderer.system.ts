@@ -1,11 +1,13 @@
-import { Transform } from "@gg/components/transform.component";
+import { Transform } from '@gg/components/transform.component';
 import Stats from 'three/addons/libs/stats.module.js';
-import { Camera, Scene, WebGLRenderer } from "three/src/Three.js";
-import { Entity } from "../entity";
-import { EntityContainer } from "../entity-container";
-import { RegisteredSystem, System } from "../system";
+import { Camera, Scene, WebGLRenderer } from 'three/src/Three.js';
+import { Entity } from '../entity';
+import { EntityContainer } from '../entity-container';
+import { RegisteredSystem, System } from '../system';
 
-export @RegisteredSystem() class Renderer extends System {
+export
+@RegisteredSystem()
+class Renderer extends System {
   private _scene: Scene = new Scene();
   public camera?: Camera;
   public stats: Stats = new Stats();
@@ -14,7 +16,7 @@ export @RegisteredSystem() class Renderer extends System {
     return this._scene;
   }
 
-  renderer = new WebGLRenderer({ antialias: true })
+  renderer = new WebGLRenderer({ antialias: true });
 
   public get container() {
     return document.querySelector('#app')!;
@@ -55,8 +57,8 @@ export @RegisteredSystem() class Renderer extends System {
       }
     }
 
-    root.onEntityRemoved = entity => removeEntityFromScene(entity);
-    root.onEntityAdded = entity => addEntityToScene(entity);
+    root.onEntityRemoved = (entity) => removeEntityFromScene(entity);
+    root.onEntityAdded = (entity) => addEntityToScene(entity);
 
     for (const entity of root.entities) {
       addEntityToScene(entity);
@@ -73,5 +75,4 @@ export @RegisteredSystem() class Renderer extends System {
     }
     this.stats.update();
   }
-
 }

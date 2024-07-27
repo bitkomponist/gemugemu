@@ -1,5 +1,5 @@
-import { merge } from "lodash";
-import { Entity, EntityDescriptor } from "./entity";
+import { merge } from 'lodash';
+import { Entity, EntityDescriptor } from './entity';
 
 export abstract class Prefab<P extends object = any> {
   protected abstract build(props?: P): EntityDescriptor;
@@ -7,20 +7,12 @@ export abstract class Prefab<P extends object = any> {
     const { overrides, ...props } = propsWithOverrides;
     const descriptor = this.build(props as P);
     return Entity.describe(
-      merge<EntityDescriptor, Partial<EntityDescriptor>>(
-        descriptor,
-        {
-          ...overrides ?? {},
-          components: [
-            ...descriptor.components ?? [],
-            ...overrides?.components ?? []
-          ],
-          entities: [
-            ...descriptor.entities ?? [],
-            ...overrides?.entities ?? []
-          ]
-        }
-      ));
+      merge<EntityDescriptor, Partial<EntityDescriptor>>(descriptor, {
+        ...(overrides ?? {}),
+        components: [...(descriptor.components ?? []), ...(overrides?.components ?? [])],
+        entities: [...(descriptor.entities ?? []), ...(overrides?.entities ?? [])],
+      }),
+    );
   }
 }
 

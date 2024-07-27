@@ -1,16 +1,16 @@
-import { LoadingManager, TextureLoader } from "three/src/Three.js";
-import { RegisteredSystem, System } from "../system";
+import { LoadingManager, TextureLoader } from 'three/src/Three.js';
+import { RegisteredSystem, System } from '../system';
 
-export @RegisteredSystem() class ResourceManager extends System {
+export
+@RegisteredSystem()
+class ResourceManager extends System {
   private _loadingManager?: LoadingManager;
 
   /**
    * Will be called when all items finish loading.
    * The default is a function with empty body.
    */
-  private onLoad() {
-
-  }
+  private onLoad() {}
 
   /**
    * Will be called for each loaded item.
@@ -37,7 +37,7 @@ export @RegisteredSystem() class ResourceManager extends System {
       this._loadingManager = new LoadingManager(
         this.onLoad.bind(this),
         this.onProgress.bind(this),
-        this.onError.bind(this)
+        this.onError.bind(this),
       );
     }
     return this._loadingManager;
@@ -51,5 +51,4 @@ export @RegisteredSystem() class ResourceManager extends System {
     }
     return this._textureLoader;
   }
-
 }

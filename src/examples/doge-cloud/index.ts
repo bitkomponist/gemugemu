@@ -6,8 +6,8 @@ import { Renderer } from '@gg/systems/renderer.system';
 import { Fog } from 'three/src/Three.js';
 import doge from '~/assets/doge.png';
 
-
-@RegisteredComponent() export class LinearRotation extends Component {
+@RegisteredComponent()
+export class LinearRotation extends Component {
   @sibling(Transform) private transform!: Transform;
 
   update(delta: number) {
@@ -17,7 +17,8 @@ import doge from '~/assets/doge.png';
   }
 }
 
-@RegisteredComponent() export class EmitDogesOverTime extends Component {
+@RegisteredComponent()
+export class EmitDogesOverTime extends Component {
   init() {
     const cubes: Entity[] = [];
 
@@ -28,9 +29,17 @@ import doge from '~/assets/doge.png';
     const spawnDespawn = () => {
       const cube = Entity.fromDescriptor({
         components: [
-          { type: 'Transform', scale: { x: .25, y: .25, z: .25 }, position: { x: -4 + Math.random() * 8, y: -4 + Math.random() * 8, z: -4 + Math.random() * 8 } },
-          { type: 'Sprite', texturePath: doge }
-        ]
+          {
+            type: 'Transform',
+            scale: { x: 0.25, y: 0.25, z: 0.25 },
+            position: {
+              x: -4 + Math.random() * 8,
+              y: -4 + Math.random() * 8,
+              z: -4 + Math.random() * 8,
+            },
+          },
+          { type: 'Sprite', texturePath: doge },
+        ],
       });
 
       const { entities } = this.entity;
@@ -41,46 +50,39 @@ import doge from '~/assets/doge.png';
         const remove = cubes.shift()!;
         entities.remove(remove);
       }
-    }
+    };
 
     setInterval(spawnDespawn, 25);
   }
 }
 
-
-export const initDogeCloud = () => Application.fromDescriptor({
-  root: {
-    entities: [
-      {
-        id: 'camera', components: [
-          { type: 'Transform', position: { x: 0, y: 0, z: 5 } },
-          { type: 'Camera' }
-        ]
-      },
-      {
-        id: 'parent',
-        components: [
-          { type: 'Transform' },
-          { type: 'LinearRotation' }
-        ],
-        entities: [
-          {
-            id: 'child',
-            components: [
-              { type: 'Transform', position: { x: 1.5, y: 0, z: 0 } },
-            ],
-            entities: [
-              {
-                id: 'grandchild',
-                components: [
-                  { type: 'Transform', position: { x: -1.5, y: 0, z: 0 } },
-                  { type: 'EmitDogesOverTime' }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
-})
+export const initDogeCloud = () =>
+  Application.fromDescriptor({
+    root: {
+      entities: [
+        {
+          id: 'camera',
+          components: [{ type: 'Transform', position: { x: 0, y: 0, z: 5 } }, { type: 'Camera' }],
+        },
+        {
+          id: 'parent',
+          components: [{ type: 'Transform' }, { type: 'LinearRotation' }],
+          entities: [
+            {
+              id: 'child',
+              components: [{ type: 'Transform', position: { x: 1.5, y: 0, z: 0 } }],
+              entities: [
+                {
+                  id: 'grandchild',
+                  components: [
+                    { type: 'Transform', position: { x: -1.5, y: 0, z: 0 } },
+                    { type: 'EmitDogesOverTime' },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  });

@@ -1,4 +1,3 @@
-
 // interface OriginGraphProps {
 //   size?: number;
 //   color?: string;
