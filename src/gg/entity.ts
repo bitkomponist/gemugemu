@@ -4,6 +4,7 @@ import { ObservableList } from './observable-list';
 import { prefabNameRegistry, PrefabType } from './prefab';
 import { System } from './system';
 
+/** Interface with properties necessary to instantiate a application object */
 export type EntityDescriptor = {
   prefab?: string | { type: string; [prop: string]: unknown };
   id?: string;
@@ -11,34 +12,35 @@ export type EntityDescriptor = {
   entities?: EntityDescriptor[];
 };
 
+/** Counter used when autogenerating entity id's */
 let entityCount = 0;
-
 export class Entity extends EntityContainer {
   /**
-   * invoked before a component will be added
-   * @param component that was will be added
+   * Invoked before a component will be added
+   *
+   * @param component - That was will be added
    */
   onAddComponent?(component: Component): void;
   /**
-   * invoked after a component was added
-   * @param component that was just added
+   * Invoked after a component was added
+   *
+   * @param component - That was just added
    */
   onComponentAdded?(component: Component): void;
   /**
-   * invoked before a component will be removed
-   * @param component that was will be removed
+   * Invoked before a component will be removed
+   *
+   * @param component - That was will be removed
    */
   onRemoveComponent?(component: Component): void;
   /**
-   * invoked after a component was removed
-   * @param component that was just removed
+   * Invoked after a component was removed
+   *
+   * @param component - That was just removed
    */
   onComponentRemoved?(component: Component): void;
 
-  get parent() {
-    return this._parent;
-  }
-
+  /** Set the parent container and emit hierarchy callbacks */
   set parent(parent: EntityContainer | undefined) {
     if (parent === this._parent) {
       return;
@@ -57,6 +59,12 @@ export class Entity extends EntityContainer {
     }
   }
 
+  /**
+   * Create a prefab-instance from a prefab descriptor
+   *
+   * @param descriptor - Prefab configuration
+   * @returns Entity
+   */
   static fromPrefab(descriptor: Exclude<EntityDescriptor['prefab'], undefined>) {
     let Type: PrefabType | undefined;
     let props: Record<string, unknown> = {};
@@ -75,6 +83,12 @@ export class Entity extends EntityContainer {
     return Entity.fromDescriptor(instance.describe(props));
   }
 
+  /**
+   * Create an entity instance based on a static descriptor configuration
+   *
+   * @param descriptor - Entity configuration to use during construction
+   * @returns Entity
+   */
   static fromDescriptor({
     prefab,
     id,
@@ -98,13 +112,29 @@ export class Entity extends EntityContainer {
     return new Entity(id ?? `E${++entityCount}`, components, entities);
   }
 
+  /** Get a descriptor from a descriptor-like object */
   static describe(descriptor?: EntityDescriptor) {
     return {
       ...(descriptor ?? {}),
     } as EntityDescriptor;
   }
-  #components = new ObservableList<Component>({
+
+  /** List of components of this entity, with observers to react to adding and removing of items */
+  private _components = new ObservableList<Component>({
+    /**
+     * Emit callback before adding a component
+     *
+     * @param component - To be added
+     * @returns Nothing
+     */
     adding: (component) => this.onAddComponent?.(component),
+    /**
+     * Emit callback after adding a component, emitting hierarchy callbacks on it and adding
+     * assigning its entity relation
+     *
+     * @param component - That was added
+     * @returns Nothing
+     */
     added: (component) => {
       if (component instanceof Component) {
         component.entity = this;
@@ -116,14 +146,34 @@ export class Entity extends EntityContainer {
 
       this.onComponentAdded?.(component);
     },
+    /**
+     * Emit callback before removing a component, emitting hierarchy callbacks on it and removing
+     * its parent entity relation
+     *
+     * @param component - That will be removed
+     * @returns Nothing
+     */
     removing: (component) => {
       this.onRemoveComponent?.(component);
       component.onRemovedFromHierarchy();
       component.entity = undefined;
     },
+    /**
+     * Emit callback after removing a component
+     *
+     * @param component - That was removed
+     * @returns Nothing
+     */
     removed: (component) => this.onComponentRemoved?.(component),
   });
 
+  /**
+   * Create a new entity instance
+   *
+   * @param id - To identify the entity by, e.g. for searching
+   * @param components - To apply on this entity
+   * @param entities - To nest under this as their parent
+   */
   constructor(
     public readonly id: string,
     components: Component[] = [],
@@ -131,13 +181,20 @@ export class Entity extends EntityContainer {
   ) {
     super();
     this.entities.add(...entities);
-    this.#components.add(...components);
+    this._components.add(...components);
   }
 
+  /** Get observable list of components in this entity */
   get components() {
-    return this.#components;
+    return this._components;
   }
 
+  /**
+   * Finds the first component instance on this entity, that is instance of ctor
+   *
+   * @param ctor - Target components class
+   * @returns Instance of ctor if found
+   */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getComponent<T extends Component>(ctor: new (...args: any[]) => T) {
     return this.components.find((component): component is T => component instanceof ctor) as
@@ -145,6 +202,13 @@ export class Entity extends EntityContainer {
       | undefined;
   }
 
+  /**
+   * Finds the first component instance on this entity, that is instance of ctor. throws error if
+   * none is found
+   *
+   * @param ctor - Target components class
+   * @returns Instance of ctor
+   */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   requireComponent<T extends Component>(ctor: new (...args: any[]) => T) {
     const component = this.getComponent(ctor);
@@ -154,11 +218,25 @@ export class Entity extends EntityContainer {
     return component;
   }
 
+  /**
+   * Finds the first system instance on this entities affiliated application, that is instance of
+   * ctor
+   *
+   * @param ctor - Target system class
+   * @returns Instance of ctor if found
+   */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getSystem<T extends System>(ctor: new (...args: any[]) => T) {
     return this.application?.systems?.find((system): system is T => system instanceof ctor);
   }
 
+  /**
+   * Finds the first system instance on this entities affiliated application, that is instance of
+   * ctor. throws error if none is found
+   *
+   * @param ctor - Target system class
+   * @returns Instance of ctor
+   */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   requireSystem<T extends System>(ctor: new (...args: any[]) => T) {
     const system = this.getSystem(ctor);
@@ -168,7 +246,25 @@ export class Entity extends EntityContainer {
     return system;
   }
 
+  /**
+   * Finds a entity in the hierarchy based on a absolute or relative path of id's,
+   *
+   * @example
+   *
+   * ```
+   * entity.findEntity('nested/child/entity-id');
+   * entity.findEntity('../sibling/entity-id');
+   * entity.findEntity('/root/entity-id');
+   * ```
+   *
+   * @param path - The absolute or relative entity path
+   * @returns The resolved entity if any
+   */
   findEntity(path: string) {
+    if (!path.startsWith('.') && !path.startsWith('/')) {
+      path = `./${path}`;
+    }
+
     function traverse(entity: Entity | undefined, segments: string[]): Entity | undefined {
       if (!entity) return undefined;
 
@@ -196,6 +292,10 @@ export class Entity extends EntityContainer {
     }
 
     const relative = path.startsWith('.');
+
+    if (path.startsWith('/')) {
+      path = path.slice(1);
+    }
 
     const root = relative ? this : this.application?.root;
 
