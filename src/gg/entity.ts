@@ -13,7 +13,7 @@ export type EntityDescriptor = {
 
 let entityCount = 0;
 
-export interface Entity {
+export class Entity extends EntityContainer {
   /**
    * invoked before a component will be added
    * @param component that was will be added
@@ -34,9 +34,7 @@ export interface Entity {
    * @param component that was just removed
    */
   onComponentRemoved?(component: Component): void;
-}
 
-export class Entity extends EntityContainer {
   get parent() {
     return this._parent;
   }
@@ -140,12 +138,14 @@ export class Entity extends EntityContainer {
     return this.#components;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getComponent<T extends Component>(ctor: new (...args: any[]) => T) {
     return this.components.find((component): component is T => component instanceof ctor) as
       | T
       | undefined;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   requireComponent<T extends Component>(ctor: new (...args: any[]) => T) {
     const component = this.getComponent(ctor);
     if (!component) {
@@ -154,10 +154,12 @@ export class Entity extends EntityContainer {
     return component;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getSystem<T extends System>(ctor: new (...args: any[]) => T) {
     return this.application?.systems?.find((system): system is T => system instanceof ctor);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   requireSystem<T extends System>(ctor: new (...args: any[]) => T) {
     const system = this.getSystem(ctor);
     if (!system) {
@@ -195,7 +197,7 @@ export class Entity extends EntityContainer {
 
     const relative = path.startsWith('.');
 
-    let root = relative ? this : this.application?.root;
+    const root = relative ? this : this.application?.root;
 
     return traverse(root as Entity, path.split('/'));
   }

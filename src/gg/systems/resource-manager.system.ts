@@ -19,7 +19,8 @@ class ResourceManager extends System {
    * @param loaded The number of items already loaded so far.
    * @param total The total amount of items to be loaded.
    */
-  private onProgress(url: string, loaded: number, total: number) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private onProgress(_url: string, _loaded: number, _total: number) {
     // todo
   }
 
@@ -28,7 +29,8 @@ class ResourceManager extends System {
    * The default is a function with empty body.
    * @param url The url of the item that errored.
    */
-  private onError(url: string) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private onError(_url: string) {
     // todo
   }
 

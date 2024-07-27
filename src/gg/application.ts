@@ -11,12 +11,20 @@ export type ApplicationDescriptor = {
   root?: { entities: EntityDescriptor[] };
 };
 export class Application {
+  /**
+   * Default systems, which should be present in every application
+   */
   static DEFAULT_SYSTEMS: SystemDescriptor[] = [
     { type: ComponentManager.name },
     { type: ResourceManager.name },
     { type: Renderer.name },
   ];
 
+  /**
+   * Create Application from a ApplicationDescriptor object
+   * @param descriptor
+   * @returns Application
+   */
   static fromDescriptor({ systems = [], root: rootDescriptor }: ApplicationDescriptor) {
     const root = new EntityContainer();
     if (rootDescriptor) {

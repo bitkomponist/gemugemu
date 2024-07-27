@@ -30,7 +30,6 @@ class PongRacket extends Component {
       this.positionTarget.y += this.impulse * this.speed;
       this.positionTarget.y = Math.min(2, Math.max(-2, this.positionTarget.y));
     }
-
     this.transform.position.y +=
       (this.positionTarget.y - this.transform.position.y) / (this.dampening * delta);
   }

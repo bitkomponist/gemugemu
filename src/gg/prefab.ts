@@ -1,7 +1,7 @@
 import { merge } from 'lodash';
 import { Entity, EntityDescriptor } from './entity';
 
-export abstract class Prefab<P extends object = any> {
+export abstract class Prefab<P extends object = object> {
   protected abstract build(props?: P): EntityDescriptor;
   describe(propsWithOverrides: Partial<P> & { overrides?: Partial<EntityDescriptor> } = {}) {
     const { overrides, ...props } = propsWithOverrides;
@@ -16,8 +16,9 @@ export abstract class Prefab<P extends object = any> {
   }
 }
 
-export type PrefabDescriptor<T extends Prefab = any> = { type: string } & Partial<T>;
+export type PrefabDescriptor<T extends Prefab = Prefab> = { type: string } & Partial<T>;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type PrefabType<T extends Prefab = Prefab> = new (...args: any[]) => T;
 
 export const prefabNameRegistry = new Map<string, PrefabType>();

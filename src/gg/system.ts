@@ -1,13 +1,11 @@
 import { Application } from './application';
 import { EntityContainer } from './entity-container';
 
-export interface System {
+export class System {
   initRoot?(root: EntityContainer): void;
   updateRoot?(root: EntityContainer, delta: number): void;
   destructRoot?(root: EntityContainer): void;
-}
 
-export class System {
   private _application?: Application;
 
   get application() {
@@ -33,8 +31,9 @@ export class System {
   }
 }
 
-export type SystemDescriptor<T extends System = any> = { type: string } & Partial<T>;
+export type SystemDescriptor<T extends System = System> = { type: string } & Partial<T>;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type SystemType<T extends System = System> = new (...args: any[]) => T;
 
 const systemNameRegistry = new Map<string, SystemType>();

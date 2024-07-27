@@ -1,13 +1,9 @@
 import { Entity } from './entity';
 import { System } from './system';
 
-export interface Component {
-  init?(): void;
-  destroy?(): void;
-}
+export type ComponentDescriptor<T extends Component = Component> = { type: string } & Partial<T>;
 
-export type ComponentDescriptor<T extends Component = any> = { type: string } & Partial<T>;
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ComponentType<T extends Component = Component> = new (...args: any[]) => T;
 
 const componentNameRegistry = new Map<string, ComponentType>();
@@ -23,6 +19,7 @@ export function RegisteredComponent(): (target: ComponentType) => void {
 }
 
 function getComponentInstance<T extends Component>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ctor: new (...args: any[]) => T,
   props: Partial<T>,
 ) {
@@ -34,10 +31,11 @@ function getComponentInstanceById<T extends Component>(name: string, props: Part
   const ctor = componentNameRegistry.get(name);
   if (!ctor) throw new Error(`unknown component type ${name}`);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return getComponentInstance<T>(ctor as new (...args: any[]) => T, props);
 }
 
-const siblingMap = new Map<Object, Map<string | symbol, ComponentType>>();
+const siblingMap = new Map<object, Map<string | symbol, ComponentType>>();
 
 export function sibling(type: ComponentType): PropertyDecorator {
   return (object, key) => {
@@ -49,7 +47,7 @@ export function sibling(type: ComponentType): PropertyDecorator {
   };
 }
 
-const entityLookupMap = new Map<Object, Map<string | symbol, string>>();
+const entityLookupMap = new Map<object, Map<string | symbol, string>>();
 
 export function entityLookup(path: string): PropertyDecorator {
   return (object, key) => {
@@ -62,11 +60,14 @@ export function entityLookup(path: string): PropertyDecorator {
 }
 
 export abstract class Component {
+  init?(): void;
+  destroy?(): void;
+
   static fromDescriptor<T extends Component>({ type: id, ...props }: ComponentDescriptor) {
     return getComponentInstanceById<T>(id, props as Partial<T>);
   }
 
-  static describe<T extends Component = any>(
+  static describe<T extends Component = Component>(
     type: ComponentType<T>,
     descriptor?: Omit<ComponentDescriptor<T>, 'type'>,
   ) {
@@ -82,18 +83,22 @@ export abstract class Component {
     props && this.set(props);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getComponent<T extends Component>(ctor: new (...args: any[]) => T) {
     return this.entity.getComponent(ctor);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   requireComponent<T extends Component>(ctor: new (...args: any[]) => T) {
     return this.entity.requireComponent(ctor);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getSystem<T extends System>(ctor: new (...args: any[]) => T) {
     return this.entity.getSystem(ctor);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   requireSystem<T extends System>(ctor: new (...args: any[]) => T) {
     return this.entity.requireSystem(ctor);
   }
@@ -124,6 +129,7 @@ export abstract class Component {
     }
 
     for (const [key, siblingType] of map.entries()) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (this as any)[key] = this.entity.requireComponent(siblingType);
     }
   }
@@ -137,6 +143,7 @@ export abstract class Component {
     }
 
     for (const [key, path] of map.entries()) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (this as any)[key] = this.entity.findEntity(path);
     }
   }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const glob = require('fast-glob');
 const { existsSync } = require('fs');
 const { mkdir, writeFile } = require('fs/promises');

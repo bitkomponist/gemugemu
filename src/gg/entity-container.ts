@@ -4,7 +4,7 @@ import { ObservableList } from './observable-list';
 
 export type EntityContainerItem = Entity | EntityContainer;
 
-export interface EntityContainer {
+export class EntityContainer {
   /**
    * invoked before a entity will be added
    * @param entity that was will be added
@@ -25,9 +25,7 @@ export interface EntityContainer {
    * @param entity that was just removed
    */
   onEntityRemoved?(entity: EntityContainerItem): void;
-}
 
-export class EntityContainer {
   protected _parent?: EntityContainer;
 
   get parent() {

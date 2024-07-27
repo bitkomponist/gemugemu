@@ -1,11 +1,11 @@
-export type ListObserver<T = any> = {
+export type ListObserver<T = unknown> = {
   adding?(item: T, target: ObservableList<T>): void;
   added?(item: T, target: ObservableList<T>): void;
   removing?(item: T, target: ObservableList<T>): void;
   removed?(item: T, target: ObservableList<T>): void;
 };
 
-export class ObservableList<T = any> {
+export class ObservableList<T = unknown> {
   private items: T[] = [];
 
   constructor(

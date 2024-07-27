@@ -65,7 +65,8 @@ class Renderer extends System {
     }
   }
 
-  destructRoot(root: EntityContainer): void {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  destructRoot(_root: EntityContainer): void {
     /** @todo implement scene unloading */
   }
 
