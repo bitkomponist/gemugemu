@@ -3,6 +3,7 @@ import { Entity, EntityDescriptor } from './entity';
 import { EntityContainer } from './entity-container';
 import { System, SystemDescriptor } from './system';
 import { ComponentManagerSystem } from './systems/component-manager.system';
+import { InputManagerSystem } from './systems/input-manager.system';
 import { RendererSystem } from './systems/renderer.system';
 import { ResourceManagerSystem } from './systems/resource-manager.system';
 
@@ -36,6 +37,7 @@ export class Application {
     { type: ComponentManagerSystem.name },
     { type: ResourceManagerSystem.name },
     { type: RendererSystem.name },
+    { type: InputManagerSystem.name },
   ];
 
   /**

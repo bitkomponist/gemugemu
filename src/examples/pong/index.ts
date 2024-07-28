@@ -4,8 +4,8 @@ import { CanvasSpriteComponent } from '@gg/components/canvas-sprite.component';
 import { TransformComponent } from '@gg/components/transform.component';
 import { EntityDescriptor } from '@gg/entity';
 import { Injectable } from '@gg/injection';
-import { isKeyPressed } from '@gg/keyboard';
 import { Prefab } from '@gg/prefab';
+import { InputManagerSystem } from '@gg/systems/input-manager.system';
 import { Vector3, Vector3Like } from 'three/src/Three.js';
 
 @Injectable()
@@ -41,11 +41,16 @@ class PongRacketPlayerControls extends Component {
   upKey = 'ArrowUp';
   downKey = 'ArrowDown';
   @sibling(PongRacket) racket!: PongRacket;
+  private input!: InputManagerSystem;
+
+  init() {
+    this.input = this.requireSystem(InputManagerSystem);
+  }
 
   update(): void {
-    if (isKeyPressed(this.upKey)) {
+    if (this.input.isKeyPressed(this.upKey)) {
       this.racket.impulse = 1;
-    } else if (isKeyPressed(this.downKey)) {
+    } else if (this.input.isKeyPressed(this.downKey)) {
       this.racket.impulse = -1;
     } else {
       this.racket.impulse = 0;
