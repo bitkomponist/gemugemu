@@ -5,6 +5,13 @@ import { System } from './system';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ComponentDescriptor<T extends Component = any> = { type: string } & Partial<T>;
 
+/**
+ * Instantiates a component of a given class and sets its properties up in one go
+ *
+ * @param ctor - Component class to instantiate
+ * @param props - Settable properties of the component class
+ * @returns Instance of component
+ */
 function getComponentInstance<T extends Component>(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ctor: new (...args: any[]) => T,
@@ -14,6 +21,13 @@ function getComponentInstance<T extends Component>(
   return component.set(props);
 }
 
+/**
+ * Instantiates a component of a given class name and sets its properties up in one go
+ *
+ * @param name - Component class name as registered per injection decorator
+ * @param props - Settable properties of the component class
+ * @returns
+ */
 function getComponentInstanceById<T extends Component>(name: string, props: Partial<T>) {
   const ctor = getInjectableType<T>(name);
   if (!ctor) throw new Error(`unknown component type ${name}`);
@@ -22,8 +36,23 @@ function getComponentInstanceById<T extends Component>(name: string, props: Part
   return getComponentInstance<T>(ctor as new (...args: any[]) => T, props);
 }
 
+/** Registry for component properties to inject siblings into */
 const siblingMap = new Map<object, Map<string | symbol, InjectableType<Component>>>();
 
+/**
+ * Decorator to inject references to sibling components into the targeted component class property
+ *
+ * @example
+ *
+ * ```
+ * class Mycomponent {
+ *   @sibling(TransformComponent) transform!: TransformComponent;
+ * }
+ * ```
+ *
+ * @param type - Component class to search for in the siblings of the target component
+ * @returns Decorated component class property
+ */
 export function sibling(type: InjectableType<Component>): PropertyDecorator {
   return (object, key) => {
     const target = object.constructor;
@@ -34,8 +63,25 @@ export function sibling(type: InjectableType<Component>): PropertyDecorator {
   };
 }
 
+/** Registry for component properties to inject entities into */
 const entityLookupMap = new Map<object, Map<string | symbol, string>>();
 
+/**
+ * Decorator to inject references to foreign entities of the hierarchy into the targeted component
+ * class property
+ *
+ * @example
+ *
+ * ```
+ * class Mycomponent {
+ *   @entityLookup('/some-root-entity-id') rootEntity!: Entity;
+ * }
+ * ```
+ *
+ * @param path - Entity path to search for
+ * @returns Decorated component class property
+ * @see Entity.findEntity
+ */
 export function entityLookup(path: string): PropertyDecorator {
   return (object, key) => {
     const target = object.constructor;
@@ -47,13 +93,32 @@ export function entityLookup(path: string): PropertyDecorator {
 }
 
 export abstract class Component {
+  /**
+   * Optional callback called when the component is first fully added to the hierarchy (parent and
+   * application are set)
+   */
   init?(): void;
+
+  /** Optional callback called when the component is removed from the hierarchy */
   destroy?(): void;
 
+  /**
+   * Create a component instance based on a given configuration
+   *
+   * @param descriptor - Configuration to construct the component with
+   * @returns Component
+   */
   static fromDescriptor<T extends Component>({ type: id, ...props }: ComponentDescriptor) {
     return getComponentInstanceById<T>(id, props as Partial<T>);
   }
 
+  /**
+   * Creates a descriptor to construct instances of this component with
+   *
+   * @param type - Class to construct a descriptor for
+   * @param descriptor - Configuration to set on a component instance created with this descriptor
+   * @returns
+   */
   static describe<T extends Component = Component>(
     type: InjectableType<T>,
     descriptor?: Omit<ComponentDescriptor<T>, 'type'>,
@@ -64,34 +129,73 @@ export abstract class Component {
     } as ComponentDescriptor<T>;
   }
 
-  #entity?: Entity;
+  /** Parent entity */
+  private _entity?: Entity;
 
+  /**
+   * Get a new instance of this component type
+   *
+   * @param props - Configuration to set on this component
+   */
   constructor(props?: Parameters<typeof this.set>[0]) {
     props && this.set(props);
   }
 
+  /**
+   * Search for the first occurance of a specific component type instance in the siblings of this
+   * component
+   *
+   * @param ctor - Component class to search for
+   * @returns Resolved instance (if any)
+   */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getComponent<T extends Component>(ctor: new (...args: any[]) => T) {
     return this.entity.getComponent(ctor);
   }
 
+  /**
+   * Search for the first occurance of a specific component type instance in the siblings of this
+   * component, throw error if none are found
+   *
+   * @param ctor - Component class to search for
+   * @returns Resolved instance
+   */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   requireComponent<T extends Component>(ctor: new (...args: any[]) => T) {
     return this.entity.requireComponent(ctor);
   }
 
+  /**
+   * Search for the first occurance of a specific system type instance in the systems of this
+   * components root application
+   *
+   * @param ctor - System class to search for
+   * @returns Resolved instance (if any)
+   */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getSystem<T extends System>(ctor: new (...args: any[]) => T) {
     return this.entity.getSystem(ctor);
   }
 
+  /**
+   * Search for the first occurance of a specific system type instance in the systems of this
+   * components root application, throw error if none is found
+   *
+   * @param ctor - System class to search for
+   * @returns Resolved instance
+   */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   requireSystem<T extends System>(ctor: new (...args: any[]) => T) {
     return this.entity.requireSystem(ctor);
   }
 
+  /** Internal flag to track if this component was initialized upon beeing added to the hierarchy */
   private initialized: boolean = false;
 
+  /**
+   * Public callback upon beeing added to hierarchy, first resolves dependencies, then executes
+   * internal init callback
+   */
   onAddedToHierarchy() {
     if (this.initialized) {
       return;
@@ -102,11 +206,13 @@ export abstract class Component {
     this.init?.();
   }
 
+  /** Public callback upon beeing removed from hierarchy */
   onRemovedFromHierarchy() {
     this.initialized = false;
     this.destroy?.();
   }
 
+  /** Resolve dependencies added with `@sibling` decorators */
   private resolveSiblings() {
     const selfType = this.constructor as InjectableType<Component>;
     const map = siblingMap.get(selfType);
@@ -121,6 +227,7 @@ export abstract class Component {
     }
   }
 
+  /** Resolve dependencies added with `@entityLookup` decorators */
   private resolveEntityLookups() {
     const selfType = this.constructor as InjectableType<Component>;
     const map = entityLookupMap.get(selfType);
@@ -135,23 +242,33 @@ export abstract class Component {
     }
   }
 
+  /** Get the parent entity, throws error when accessed before initialization */
   public get entity(): Entity {
-    if (!this.#entity) {
+    if (!this._entity) {
       throw new Error(`tried to access component.entity before initialization`);
     }
 
-    return this.#entity;
+    return this._entity;
   }
 
+  /** Set the parent entity of this component */
   public set entity(entity: Entity | undefined) {
-    this.#entity = entity;
+    this._entity = entity;
   }
 
+  /**
+   * Set arbitrary properties of this instance. use with care, since we dont check here if those
+   * props are valid or not
+   *
+   * @param props - Partial props of this component
+   * @returns Self
+   */
   set(props: Partial<typeof this>) {
     Object.assign(this, props);
     return this;
   }
 
+  /** Get the root application of which's hierarchy this component is part of */
   get application() {
     return this.entity?.application;
   }
