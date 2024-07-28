@@ -1,7 +1,8 @@
 import { Component, ComponentDescriptor } from './component';
 import { EntityContainer, EntityContainerItem } from './entity-container';
+import { getInjectableType, InjectableType } from './injection';
 import { ObservableList } from './observable-list';
-import { prefabNameRegistry, PrefabType } from './prefab';
+import { Prefab } from './prefab';
 import { System } from './system';
 
 /** Interface with properties necessary to instantiate a application object */
@@ -66,13 +67,13 @@ export class Entity extends EntityContainer {
    * @returns Entity
    */
   static fromPrefab(descriptor: Exclude<EntityDescriptor['prefab'], undefined>) {
-    let Type: PrefabType | undefined;
+    let Type: InjectableType<Prefab> | undefined;
     let props: Record<string, unknown> = {};
     if (typeof descriptor === 'string') {
-      Type = prefabNameRegistry.get(descriptor);
+      Type = getInjectableType<Prefab>(descriptor);
     } else {
       const { type: typeName, ...prefabProps } = descriptor;
-      Type = prefabNameRegistry.get(typeName);
+      Type = getInjectableType<Prefab>(typeName);
       props = prefabProps;
     }
 

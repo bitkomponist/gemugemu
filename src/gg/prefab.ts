@@ -17,20 +17,3 @@ export abstract class Prefab<P extends object = object> {
 }
 
 export type PrefabDescriptor<T extends Prefab = Prefab> = { type: string } & Partial<T>;
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type PrefabType<T extends Prefab = Prefab> = new (...args: any[]) => T;
-
-export const prefabNameRegistry = new Map<string, PrefabType>();
-
-const prefabRegistry = new Map<PrefabType, string>();
-
-export function RegisteredPrefab(): (target: PrefabType) => void {
-  return (target) => {
-    if (prefabNameRegistry.has(target.name)) {
-      throw new Error(`Prefab type ${target.name} is already registered`);
-    }
-    prefabNameRegistry.set(target.name, target);
-    prefabRegistry.set(target, target.name);
-  };
-}

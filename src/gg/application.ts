@@ -2,9 +2,9 @@ import '@gg/registry';
 import { Entity, EntityDescriptor } from './entity';
 import { EntityContainer } from './entity-container';
 import { System, SystemDescriptor } from './system';
-import { ComponentManager } from './systems/component-manager.system';
-import { Renderer } from './systems/renderer.system';
-import { ResourceManager } from './systems/resource-manager.system';
+import { ComponentManagerSystem } from './systems/component-manager.system';
+import { RendererSystem } from './systems/renderer.system';
+import { ResourceManagerSystem } from './systems/resource-manager.system';
 
 /** Interface with properties necessary to instantiate a application object */
 export type ApplicationDescriptor = {
@@ -33,9 +33,9 @@ export type ApplicationDescriptor = {
 export class Application {
   /** Default systems, which should be present in every application */
   static DEFAULT_SYSTEMS: SystemDescriptor[] = [
-    { type: ComponentManager.name },
-    { type: ResourceManager.name },
-    { type: Renderer.name },
+    { type: ComponentManagerSystem.name },
+    { type: ResourceManagerSystem.name },
+    { type: RendererSystem.name },
   ];
 
   /**

@@ -1,11 +1,12 @@
-import { Component, RegisteredComponent, sibling } from '@gg/component';
-import { Renderer } from '@gg/systems/renderer.system';
+import { Component, sibling } from '@gg/component';
+import { Injectable } from '@gg/injection';
+import { RendererSystem } from '@gg/systems/renderer.system';
 import { OrthographicCamera as ThreeOrthographicCamera, Vector2 } from 'three/src/Three.js';
-import { Transform } from './transform.component';
+import { TransformComponent } from './transform.component';
 
 export
-@RegisteredComponent()
-class OrthographicCamera extends Component {
+@Injectable()
+class OrthographicCameraComponent extends Component {
   private _viewport = new Vector2(window.innerWidth, window.innerHeight);
 
   get viewport() {
@@ -67,7 +68,7 @@ class OrthographicCamera extends Component {
     return this._camera;
   }
 
-  @sibling(Transform) transform!: Transform;
+  @sibling(TransformComponent) transform!: TransformComponent;
 
   updateCameraProjection() {
     const { camera, frustumSize } = this;
@@ -82,7 +83,7 @@ class OrthographicCamera extends Component {
   }
 
   init(): void {
-    const renderer = this.requireSystem(Renderer);
+    const renderer = this.requireSystem(RendererSystem);
     renderer.camera = this.camera;
     this.transform.object3d.add(this.camera);
     const resize = () => {

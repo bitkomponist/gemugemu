@@ -1,11 +1,12 @@
-import { Component, RegisteredComponent, sibling } from '@gg/component';
-import { ResourceManager } from '@gg/systems/resource-manager.system';
+import { Component, sibling } from '@gg/component';
+import { Injectable } from '@gg/injection';
+import { ResourceManagerSystem } from '@gg/systems/resource-manager.system';
 import { SpriteMaterial, Texture, Sprite as ThreeSprite } from 'three/src/Three.js';
-import { Transform } from './transform.component';
+import { TransformComponent } from './transform.component';
 
 export
-@RegisteredComponent()
-class Sprite extends Component {
+@Injectable()
+class SpriteComponent extends Component {
   sprite: ThreeSprite = new ThreeSprite();
   spriteMaterial: SpriteMaterial = new SpriteMaterial({ color: 0xffffff, fog: true });
   texturePath?: string;
@@ -24,10 +25,10 @@ class Sprite extends Component {
     this.sprite.visible = !!texture;
   }
 
-  @sibling(Transform) transform!: Transform;
+  @sibling(TransformComponent) transform!: TransformComponent;
 
   loadTexture(path: string, onProgress?: (event: ProgressEvent) => void) {
-    return this.requireSystem(ResourceManager).textureLoader.loadAsync(path, onProgress);
+    return this.requireSystem(ResourceManagerSystem).textureLoader.loadAsync(path, onProgress);
   }
 
   async init() {

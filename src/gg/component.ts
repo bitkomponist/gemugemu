@@ -1,23 +1,9 @@
 import { Entity } from './entity';
+import { getInjectableType, InjectableType } from './injection';
 import { System } from './system';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ComponentDescriptor<T extends Component = any> = { type: string } & Partial<T>;
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type ComponentType<T extends Component = Component> = new (...args: any[]) => T;
-
-const componentNameRegistry = new Map<string, ComponentType>();
-const componentRegistry = new Map<ComponentType, string>();
-export function RegisteredComponent(): (target: ComponentType) => void {
-  return (target) => {
-    if (componentNameRegistry.has(target.name)) {
-      throw new Error(`Component type ${target.name} is already registered`);
-    }
-    componentNameRegistry.set(target.name, target);
-    componentRegistry.set(target, target.name);
-  };
-}
 
 function getComponentInstance<T extends Component>(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -29,16 +15,16 @@ function getComponentInstance<T extends Component>(
 }
 
 function getComponentInstanceById<T extends Component>(name: string, props: Partial<T>) {
-  const ctor = componentNameRegistry.get(name);
+  const ctor = getInjectableType<T>(name);
   if (!ctor) throw new Error(`unknown component type ${name}`);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return getComponentInstance<T>(ctor as new (...args: any[]) => T, props);
 }
 
-const siblingMap = new Map<object, Map<string | symbol, ComponentType>>();
+const siblingMap = new Map<object, Map<string | symbol, InjectableType<Component>>>();
 
-export function sibling(type: ComponentType): PropertyDecorator {
+export function sibling(type: InjectableType): PropertyDecorator {
   return (object, key) => {
     const target = object.constructor;
     if (!siblingMap.has(target)) {
@@ -69,7 +55,7 @@ export abstract class Component {
   }
 
   static describe<T extends Component = Component>(
-    type: ComponentType<T>,
+    type: InjectableType<T>,
     descriptor?: Omit<ComponentDescriptor<T>, 'type'>,
   ) {
     return {
@@ -122,7 +108,7 @@ export abstract class Component {
   }
 
   private resolveSiblings() {
-    const selfType = this.constructor as ComponentType;
+    const selfType = this.constructor as InjectableType<Component>;
     const map = siblingMap.get(selfType);
 
     if (!map) {
@@ -136,7 +122,7 @@ export abstract class Component {
   }
 
   private resolveEntityLookups() {
-    const selfType = this.constructor as ComponentType;
+    const selfType = this.constructor as InjectableType<Component>;
     const map = entityLookupMap.get(selfType);
 
     if (!map) {

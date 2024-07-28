@@ -1,5 +1,6 @@
 import { Application } from './application';
 import { EntityContainer } from './entity-container';
+import { getInjectableType } from './injection';
 
 export class System {
   initRoot?(root: EntityContainer): void;
@@ -22,7 +23,7 @@ export class System {
 
   static fromDescriptor(descriptor: SystemDescriptor) {
     const { type, ...props } = descriptor;
-    const SystemType = systemNameRegistry.get(type);
+    const SystemType = getInjectableType<System>(type);
     if (!SystemType) {
       throw new Error(`unknown system type ${type}`);
     }
@@ -32,20 +33,3 @@ export class System {
 }
 
 export type SystemDescriptor<T extends System = System> = { type: string } & Partial<T>;
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type SystemType<T extends System = System> = new (...args: any[]) => T;
-
-const systemNameRegistry = new Map<string, SystemType>();
-
-const systemRegistry = new Map<SystemType, string>();
-
-export function RegisteredSystem(): (target: SystemType) => void {
-  return (target) => {
-    if (systemNameRegistry.has(target.name)) {
-      throw new Error(`System type ${target.name} is already registered`);
-    }
-    systemNameRegistry.set(target.name, target);
-    systemRegistry.set(target, target.name);
-  };
-}

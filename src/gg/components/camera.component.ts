@@ -1,11 +1,12 @@
-import { Component, RegisteredComponent, sibling } from '@gg/component';
-import { Renderer } from '@gg/systems/renderer.system';
+import { Component, sibling } from '@gg/component';
+import { Injectable } from '@gg/injection';
+import { RendererSystem } from '@gg/systems/renderer.system';
 import { PerspectiveCamera, Vector2 } from 'three/src/Three.js';
-import { Transform } from './transform.component';
+import { TransformComponent } from './transform.component';
 
 export
-@RegisteredComponent()
-class Camera extends Component {
+@Injectable()
+class CameraComponent extends Component {
   private _viewport = new Vector2(1, 1);
 
   get viewport() {
@@ -63,7 +64,7 @@ class Camera extends Component {
     return this._camera;
   }
 
-  @sibling(Transform) transform!: Transform;
+  @sibling(TransformComponent) transform!: TransformComponent;
 
   updateCameraProjection() {
     this.camera.aspect = this.viewport.x / this.viewport.y;
@@ -71,7 +72,7 @@ class Camera extends Component {
   }
 
   init(): void {
-    const renderer = this.requireSystem(Renderer);
+    const renderer = this.requireSystem(RendererSystem);
 
     renderer.camera = this.camera;
 

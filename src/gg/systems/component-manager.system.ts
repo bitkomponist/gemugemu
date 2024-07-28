@@ -1,6 +1,7 @@
 import { Component } from '@gg/component';
+import { Injectable } from '@gg/injection';
 import { EntityContainer } from '../entity-container';
-import { RegisteredSystem, System } from '../system';
+import { System } from '../system';
 
 export interface LifecycleComponent {
   update?(delta: number): void;
@@ -11,8 +12,8 @@ declare module '@gg/component' {
 }
 
 export
-@RegisteredSystem()
-class ComponentManager extends System {
+@Injectable()
+class ComponentManagerSystem extends System {
   private dirty = true;
   private updateables: Component[] = [];
 

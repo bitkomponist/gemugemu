@@ -1,12 +1,13 @@
 import { Application } from '@gg/application';
-import { Component, RegisteredComponent, sibling } from '@gg/component';
+import { Component, sibling } from '@gg/component';
 import { Transform } from '@gg/components/transform.component';
 import { Entity } from '@gg/entity';
+import { Injectable } from '@gg/injection';
 import { Renderer } from '@gg/systems/renderer.system';
 import { Fog } from 'three/src/Three.js';
 import doge from '~/assets/doge.png';
 
-@RegisteredComponent()
+@Injectable()
 export class LinearRotation extends Component {
   @sibling(Transform) private transform!: Transform;
 
@@ -17,7 +18,7 @@ export class LinearRotation extends Component {
   }
 }
 
-@RegisteredComponent()
+@Injectable()
 export class EmitDogesOverTime extends Component {
   init() {
     const cubes: Entity[] = [];

@@ -1,10 +1,11 @@
-import { Component, RegisteredComponent, sibling } from '@gg/component';
+import { Component, sibling } from '@gg/component';
+import { Injectable } from '@gg/injection';
 import { CanvasTexture } from 'three/src/Three.js';
-import { Sprite } from './sprite.component';
+import { SpriteComponent } from './sprite.component';
 
 export
-@RegisteredComponent()
-class CanvasSprite extends Component {
+@Injectable()
+class CanvasSpriteComponent extends Component {
   private _size = 128;
   get size() {
     return this._size;
@@ -25,7 +26,7 @@ class CanvasSprite extends Component {
     return this._domElement!;
   }
 
-  @sibling(Sprite) sprite!: Sprite;
+  @sibling(SpriteComponent) sprite!: SpriteComponent;
 
   resize() {
     const { _domElement } = this;

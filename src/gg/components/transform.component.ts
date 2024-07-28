@@ -1,10 +1,11 @@
 import { Entity } from '@gg/entity';
+import { Injectable } from '@gg/injection';
 import { Euler, Object3D, Quaternion, Vector3, Vector3Like } from 'three/src/Three.js';
-import { Component, RegisteredComponent } from '../component';
+import { Component } from '../component';
 
 export
-@RegisteredComponent()
-class Transform extends Component {
+@Injectable()
+class TransformComponent extends Component {
   public object3d = new Object3D();
 
   get position(): Vector3 {
@@ -44,7 +45,7 @@ class Transform extends Component {
 
     if (!this.entity.parent || !(this.entity.parent instanceof Entity)) return;
 
-    const parentTransform = this.entity.parent.getComponent(Transform);
+    const parentTransform = this.entity.parent.getComponent(TransformComponent);
 
     if (parentTransform?.object3d) {
       parentTransform.object3d.add(this.object3d);
@@ -60,5 +61,5 @@ class Transform extends Component {
     super.onRemovedFromHierarchy();
   }
 
-  /** @todo remove from parent when component or entity removed */
+  /** @todo Remove from parent when component or entity removed */
 }

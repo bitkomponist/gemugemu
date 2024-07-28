@@ -1,20 +1,21 @@
 import { Application } from '@gg/application';
-import { Component, RegisteredComponent, sibling } from '@gg/component';
-import { CanvasSprite } from '@gg/components/canvas-sprite.component';
-import { Transform } from '@gg/components/transform.component';
+import { Component, sibling } from '@gg/component';
+import { CanvasSpriteComponent } from '@gg/components/canvas-sprite.component';
+import { TransformComponent } from '@gg/components/transform.component';
 import { EntityDescriptor } from '@gg/entity';
+import { Injectable } from '@gg/injection';
 import { isKeyPressed } from '@gg/keyboard';
-import { Prefab, RegisteredPrefab } from '@gg/prefab';
+import { Prefab } from '@gg/prefab';
 import { Vector3, Vector3Like } from 'three/src/Three.js';
 
-@RegisteredComponent()
+@Injectable()
 class PongRacket extends Component {
   private positionTarget = new Vector3();
   speed = 0.1;
   dampening = 1;
   impulse = 0;
-  @sibling(Transform) transform!: Transform;
-  @sibling(CanvasSprite) canvas!: CanvasSprite;
+  @sibling(TransformComponent) transform!: TransformComponent;
+  @sibling(CanvasSpriteComponent) canvas!: CanvasSpriteComponent;
 
   init(): void {
     this.positionTarget.copy(this.transform.position);
@@ -35,7 +36,7 @@ class PongRacket extends Component {
   }
 }
 
-@RegisteredComponent()
+@Injectable()
 class PongRacketPlayerControls extends Component {
   upKey = 'ArrowUp';
   downKey = 'ArrowDown';
@@ -52,10 +53,10 @@ class PongRacketPlayerControls extends Component {
   }
 }
 
-@RegisteredComponent()
+@Injectable()
 class PongBall extends Component {
-  @sibling(CanvasSprite) canvas!: CanvasSprite;
-  @sibling(Transform) transform!: Transform;
+  @sibling(CanvasSpriteComponent) canvas!: CanvasSpriteComponent;
+  @sibling(TransformComponent) transform!: TransformComponent;
   direction = new Vector3();
   speed = 0.005;
   private posUpdate = new Vector3();
@@ -104,7 +105,7 @@ class PongBall extends Component {
   }
 }
 
-@RegisteredPrefab()
+@Injectable()
 class PongRacketPrefab extends Prefab {
   protected build({
     position = { x: 0, y: 0, z: 0 },
@@ -112,16 +113,16 @@ class PongRacketPrefab extends Prefab {
     return {
       id: 'pong-racket',
       components: [
-        { type: 'Transform', position },
-        { type: 'Sprite' },
-        { type: 'CanvasSprite' },
+        { type: 'TransformComponent', position },
+        { type: 'SpriteComponent' },
+        { type: 'CanvasSpriteComponent' },
         { type: PongRacket.name },
       ],
     };
   }
 }
 
-@RegisteredPrefab()
+@Injectable()
 class PongBallPrefab extends Prefab {
   protected build({
     position = { x: 0, y: 0, z: 0 },
@@ -129,9 +130,9 @@ class PongBallPrefab extends Prefab {
     return {
       id: 'pong-ball',
       components: [
-        { type: 'Transform', position, scale: { x: 0.5, y: 0.5, z: 1 } },
-        { type: 'Sprite' },
-        { type: 'CanvasSprite' },
+        { type: 'TransformComponent', position, scale: { x: 0.5, y: 0.5, z: 1 } },
+        { type: 'SpriteComponent' },
+        { type: 'CanvasSpriteComponent' },
         { type: PongBall.name },
       ],
     };
@@ -144,8 +145,8 @@ export const initPong = () =>
       entities: [
         {
           components: [
-            { type: 'Transform', position: { x: 0, y: 0, z: 1 } },
-            { type: 'OrthographicCamera', frustumSize: 7 },
+            { type: 'TransformComponent', position: { x: 0, y: 0, z: 1 } },
+            { type: 'OrthographicCameraComponent', frustumSize: 7 },
           ],
         },
         {

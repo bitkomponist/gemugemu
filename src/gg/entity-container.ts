@@ -107,6 +107,7 @@ export class EntityContainer {
     if (!prev && application) {
       for (const entity of this.getGrandChildren()) {
         if (!('components' in entity)) continue;
+        console.log(entity.application);
         for (const comp of entity.components) {
           comp.onAddedToHierarchy();
         }

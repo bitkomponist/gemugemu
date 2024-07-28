@@ -1,13 +1,14 @@
-import { Transform } from '@gg/components/transform.component';
+import { TransformComponent } from '@gg/components/transform.component';
+import { Injectable } from '@gg/injection';
 import Stats from 'three/addons/libs/stats.module.js';
 import { Camera, Scene, WebGLRenderer } from 'three/src/Three.js';
 import { Entity } from '../entity';
 import { EntityContainer } from '../entity-container';
-import { RegisteredSystem, System } from '../system';
+import { System } from '../system';
 
 export
-@RegisteredSystem()
-class Renderer extends System {
+@Injectable()
+class RendererSystem extends System {
   private _scene: Scene = new Scene();
   public camera?: Camera;
   public stats: Stats = new Stats();
@@ -41,7 +42,7 @@ class Renderer extends System {
 
     function addEntityToScene(entity: Entity | EntityContainer) {
       if (entity instanceof Entity) {
-        const transform = entity.getComponent(Transform);
+        const transform = entity.getComponent(TransformComponent);
         if (transform && !scene.children.includes(transform.object3d)) {
           scene.add(transform.object3d);
         }
@@ -50,7 +51,7 @@ class Renderer extends System {
 
     function removeEntityFromScene(entity: Entity | EntityContainer) {
       if (entity instanceof Entity) {
-        const transform = entity.getComponent(Transform);
+        const transform = entity.getComponent(TransformComponent);
         if (transform && scene.children.includes(transform.object3d)) {
           scene.remove(transform.object3d);
         }
@@ -67,7 +68,7 @@ class Renderer extends System {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   destructRoot(_root: EntityContainer): void {
-    /** @todo implement scene unloading */
+    /** @todo Implement scene unloading */
   }
 
   updateRoot(): void {

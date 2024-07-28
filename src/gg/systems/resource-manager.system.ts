@@ -1,23 +1,21 @@
+import { Injectable } from '@gg/injection';
 import { LoadingManager, TextureLoader } from 'three/src/Three.js';
-import { RegisteredSystem, System } from '../system';
+import { System } from '../system';
 
 export
-@RegisteredSystem()
-class ResourceManager extends System {
+@Injectable()
+class ResourceManagerSystem extends System {
   private _loadingManager?: LoadingManager;
 
-  /**
-   * Will be called when all items finish loading.
-   * The default is a function with empty body.
-   */
+  /** Will be called when all items finish loading. The default is a function with empty body. */
   private onLoad() {}
 
   /**
-   * Will be called for each loaded item.
-   * The default is a function with empty body.
-   * @param url The url of the item just loaded.
-   * @param loaded The number of items already loaded so far.
-   * @param total The total amount of items to be loaded.
+   * Will be called for each loaded item. The default is a function with empty body.
+   *
+   * @param url - The url of the item just loaded.
+   * @param loaded - The number of items already loaded so far.
+   * @param total - The total amount of items to be loaded.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private onProgress(_url: string, _loaded: number, _total: number) {
@@ -25,9 +23,9 @@ class ResourceManager extends System {
   }
 
   /**
-   * Will be called when item loading fails.
-   * The default is a function with empty body.
-   * @param url The url of the item that errored.
+   * Will be called when item loading fails. The default is a function with empty body.
+   *
+   * @param url - The url of the item that errored.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private onError(_url: string) {
