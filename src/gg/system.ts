@@ -2,13 +2,32 @@ import { Application } from './application';
 import { EntityContainer } from './entity-container';
 import { getInjectableType } from './injection';
 
+/** Base class for systems that are instantiated once per application */
 export class System {
+  /**
+   * Optional callback to run when a application is first started
+   *
+   * @param root - Entitycontainer that resembles the hierarchy root of this application
+   */
   initRoot?(root: EntityContainer): void;
+  /**
+   * Optional callback to run when an application's update loop is invoked
+   *
+   * @param root - Entitycontainer that resembles the hierarchy root of this application
+   * @param delta - Time between this and the last update loops execution
+   */
   updateRoot?(root: EntityContainer, delta: number): void;
+  /**
+   * Optional callback to run when a applications root entitycontainer is removed
+   *
+   * @param root - Entitycontainer that resembles the hierarchy root of this application
+   */
   destructRoot?(root: EntityContainer): void;
 
+  /** Internal reference to the parent application */
   private _application?: Application;
 
+  /** Gets the parent application, throws when accessed before initialization */
   get application() {
     if (!this._application) {
       throw new Error('tried to access application before proper initialization');
@@ -17,10 +36,17 @@ export class System {
     return this._application;
   }
 
+  /** Sets the parent application */
   set application(application: Application) {
     this._application = application;
   }
 
+  /**
+   * Creates a system instance based on a given configuration object (descriptor)
+   *
+   * @param descriptor - Configuration to set on the newly created system instance
+   * @returns The system
+   */
   static fromDescriptor(descriptor: SystemDescriptor) {
     const { type, ...props } = descriptor;
     const SystemType = getInjectableType<System>(type);
