@@ -31,7 +31,7 @@ export class EmitDogesOverTime extends Component {
       const cube = Entity.fromDescriptor({
         components: [
           {
-            type: 'Transform',
+            type: 'TransformComponent',
             scale: { x: 0.25, y: 0.25, z: 0.25 },
             position: {
               x: -4 + Math.random() * 8,
@@ -39,7 +39,7 @@ export class EmitDogesOverTime extends Component {
               z: -4 + Math.random() * 8,
             },
           },
-          { type: 'Sprite', texturePath: doge },
+          { type: 'SpriteComponent', texturePath: doge },
         ],
       });
 
@@ -63,20 +63,23 @@ export const initDogeCloud = () =>
       entities: [
         {
           id: 'camera',
-          components: [{ type: 'Transform', position: { x: 0, y: 0, z: 5 } }, { type: 'Camera' }],
+          components: [
+            { type: 'TransformComponent', position: { x: 0, y: 0, z: 5 } },
+            { type: 'CameraComponent' },
+          ],
         },
         {
           id: 'parent',
-          components: [{ type: 'Transform' }, { type: 'LinearRotation' }],
+          components: [{ type: 'TransformComponent' }, { type: 'LinearRotation' }],
           entities: [
             {
               id: 'child',
-              components: [{ type: 'Transform', position: { x: 1.5, y: 0, z: 0 } }],
+              components: [{ type: 'TransformComponent', position: { x: 1.5, y: 0, z: 0 } }],
               entities: [
                 {
                   id: 'grandchild',
                   components: [
-                    { type: 'Transform', position: { x: -1.5, y: 0, z: 0 } },
+                    { type: 'TransformComponent', position: { x: -1.5, y: 0, z: 0 } },
                     { type: 'EmitDogesOverTime' },
                   ],
                 },
