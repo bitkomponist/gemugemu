@@ -1,3 +1,4 @@
+/** Object of supported observable list callbacks */
 export type ListObserver<T = unknown> = {
   adding?(item: T, target: ObservableList<T>): void;
   added?(item: T, target: ObservableList<T>): void;
@@ -5,9 +6,21 @@ export type ListObserver<T = unknown> = {
   removed?(item: T, target: ObservableList<T>): void;
 };
 
+/**
+ * List class with a subset of array methods and the ability to observe when elements are added or
+ * removed
+ */
 export class ObservableList<T = unknown> {
+  /** Internal storage of the list items */
   private items: T[] = [];
 
+  /**
+   * Get a observable list instance
+   *
+   * @param observer - Object containing event handlers
+   * @param initialItems - Initial state of the list
+   * @param distinct - Wether to allow each item only once in the array
+   */
   constructor(
     private observer?: ListObserver<T>,
     initialItems: T[] = [],
@@ -18,6 +31,12 @@ export class ObservableList<T = unknown> {
     }
   }
 
+  /**
+   * Add an arbitrary number of items to the list, ignore duplicates if distinct flag is set
+   *
+   * @param items - To add to the list
+   * @returns This list
+   */
   add(...items: T[]) {
     for (const item of items) {
       if (this.distinct && this.items.includes(item)) {
@@ -32,18 +51,45 @@ export class ObservableList<T = unknown> {
     return this;
   }
 
+  /**
+   * Takes an integer value and returns the item at that index, allowing for positive and negative
+   * integers. Negative integers count back from the last item in the array.
+   *
+   * @param index - Target index
+   * @returns Item at index
+   */
   at(index: number) {
     return this.items.at(index);
   }
 
-  indexOf(item: T) {
-    return this.items.indexOf(item);
+  /**
+   * Returns the index of the first occurrence of a value in an array, or -1 if it is not present.
+   *
+   * @param item - The value to locate in the array.
+   * @param fromIndex - The array index at which to begin the search. If fromIndex is omitted, the
+   *   search starts at index 0.
+   * @returns Resolved index or -1 if none found
+   */
+  indexOf(item: T, fromIndex = 0) {
+    return this.items.indexOf(item, fromIndex);
   }
 
-  includes(item: T) {
-    return this.items.includes(item);
+  /**
+   * Determines whether an array includes a certain item, returning true or false as appropriate.
+   *
+   * @param item - The item to search for
+   * @param fromIndex - The position in this array at which to begin searching for searchItem
+   * @returns Item found or not
+   */
+  includes(item: T, fromIndex = 0) {
+    return this.items.includes(item, fromIndex);
   }
 
+  /**
+   * Removes all current items from the list
+   *
+   * @returns This list
+   */
   empty() {
     while (this.length) {
       this.removeAt(0);
@@ -52,6 +98,17 @@ export class ObservableList<T = unknown> {
     return this;
   }
 
+  /**
+   * Returns the value of the first item in the array where predicate is true, and undefined
+   * otherwise.
+   *
+   * @param predicate - Find calls predicate once for each element of the array, in ascending order,
+   *   until it finds one where predicate returns true. If such an element is found, find
+   *   immediately returns that element value. Otherwise, find returns undefined.
+   * @param thisArg - If provided, it will be used as the this value for each invocation of
+   *   predicate. If it is not provided, undefined is used instead.
+   * @returns Resolved item
+   */
   find<S extends T>(...args: Parameters<typeof this.items.find<S>>) {
     return this.items.find<T>(...args);
   }
@@ -70,6 +127,12 @@ export class ObservableList<T = unknown> {
     return this;
   }
 
+  /**
+   * Remove an arbitrary number of items from the list
+   *
+   * @param items - To remove from the list
+   * @returns This list
+   */
   remove(...items: T[]) {
     for (const item of items) {
       this.removeAt(this.items.indexOf(item));
@@ -78,10 +141,16 @@ export class ObservableList<T = unknown> {
     return this;
   }
 
+  /** The number of items currently in this list */
   get length() {
     return this.items.length;
   }
 
+  /**
+   * Get an iterator for this list
+   *
+   * @returns New iterator to step through this list
+   */
   [Symbol.iterator]() {
     let index = -1;
     const { items } = this;
