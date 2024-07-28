@@ -41,6 +41,10 @@ export class Entity extends EntityContainer {
    */
   onComponentRemoved?(component: Component): void;
 
+  get parent() {
+    return this._parent;
+  }
+
   /** Set the parent container and emit hierarchy callbacks */
   set parent(parent: EntityContainer | undefined) {
     if (parent === this._parent) {
