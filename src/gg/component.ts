@@ -24,7 +24,7 @@ function getComponentInstanceById<T extends Component>(name: string, props: Part
 
 const siblingMap = new Map<object, Map<string | symbol, InjectableType<Component>>>();
 
-export function sibling(type: InjectableType): PropertyDecorator {
+export function sibling(type: InjectableType<Component>): PropertyDecorator {
   return (object, key) => {
     const target = object.constructor;
     if (!siblingMap.has(target)) {
