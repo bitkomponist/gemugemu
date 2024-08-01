@@ -19,27 +19,24 @@ type ObservableListEventMap<T = unknown> = {
  * List class with a subset of array methods and the ability to observe when elements are added or
  * removed
  */
-export class ObservableList<T = unknown> {
-  private _observer = new Observable<ObservableListEventMap<T>>();
-
-  get observer() {
-    return this._observer;
-  }
-
+export class ObservableList<T = unknown> extends Observable<ObservableListEventMap<T>> {
   /** Internal storage of the list items */
   private items: T[] = [];
 
   /**
    * Get a observable list instance
    *
-   * @param observers - Initial Event subscriptions
+   * @param observableEventSubscription - Initial Event subscriptions
    * @param distinct - Wether to allow each item only once in the array
    */
   constructor(
-    observers?: ObserverEventSubscription<ObservableListEventMap<T>>,
+    observableEventSubscription?: ObserverEventSubscription<ObservableListEventMap<T>>,
     private distinct = true,
   ) {
-    observers && this.observer.subscribe(observers);
+    super();
+    if (observableEventSubscription) {
+      this.subscribe(observableEventSubscription);
+    }
   }
 
   /**
@@ -54,9 +51,9 @@ export class ObservableList<T = unknown> {
         continue;
       }
 
-      this.observer.emit('adding', { item, target: this });
+      this.emit('adding', { item, target: this });
       this.items.push(item);
-      this.observer.emit('added', { item, target: this });
+      this.emit('added', { item, target: this });
     }
 
     return this;
@@ -131,9 +128,9 @@ export class ObservableList<T = unknown> {
 
     const item = this.items[index];
 
-    this.observer.emit('removing', { item, target: this });
+    this.emit('removing', { item, target: this });
     this.items.splice(index, 1);
-    this.observer.emit('removed', { item, target: this });
+    this.emit('removed', { item, target: this });
 
     return this;
   }
