@@ -139,8 +139,8 @@ export class Application {
    * @param time - DOMHighResTimeStamp
    */
   private onAnimationFrame: FrameRequestCallback = (time) => {
+    this.currentAnimationFrame = requestAnimationFrame(this.onAnimationFrame);
     const delta = time - this.lastTime;
-
     if (this.root) {
       const { root } = this;
       this.systems?.forEach((sys) => {
@@ -149,6 +149,5 @@ export class Application {
     }
 
     this.lastTime = time;
-    this.currentAnimationFrame = requestAnimationFrame(this.onAnimationFrame);
   };
 }

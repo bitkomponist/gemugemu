@@ -51,9 +51,9 @@ export class ObservableList<T = unknown> extends Observable<ObservableListEventM
         continue;
       }
 
-      this.emit('adding', { item, target: this });
+      this.emit({ type: 'adding', item, target: this });
       this.items.push(item);
-      this.emit('added', { item, target: this });
+      this.emit({ type: 'added', item, target: this });
     }
 
     return this;
@@ -128,9 +128,9 @@ export class ObservableList<T = unknown> extends Observable<ObservableListEventM
 
     const item = this.items[index];
 
-    this.emit('removing', { item, target: this });
+    this.emit({ type: 'removing', item, target: this });
     this.items.splice(index, 1);
-    this.emit('removed', { item, target: this });
+    this.emit({ type: 'removed', item, target: this });
 
     return this;
   }

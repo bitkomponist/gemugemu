@@ -34,10 +34,10 @@ export class Observable<TEventMap extends ObservableEventMap = ObservableEventMa
       ?.delete(observer as ObserverEventListener<TEventMap, keyof TEventMap>);
   }
 
-  emit<K extends keyof TEventMap>(type: K, eventData: TEventMap[K]) {
-    //if(!this._observers?.get(type)?.size) return this;
+  emit<K extends keyof TEventMap>(event: { type: K } & TEventMap[K]) {
+    const { type, ...eventData } = event;
     this._observers?.get(type)?.forEach((observer) => {
-      observer(eventData);
+      observer(eventData as TEventMap[K]);
     });
     return this;
   }

@@ -87,11 +87,11 @@ export class Entity extends Observable<EntityEventMap> {
 
     if (parent && this.application) {
       for (const component of this.components) {
-        component.emit('added-to-hierarchy', {});
+        component.emit({ type: 'added-to-hierarchy' });
       }
     } else if (!parent) {
       for (const component of this.components) {
-        component.emit('removed-from-hierarchy', {});
+        component.emit({ type: 'removed-from-hierarchy' });
       }
     }
   }
@@ -107,7 +107,7 @@ export class Entity extends Observable<EntityEventMap> {
      * @param entity - To be added
      * @returns Nothing
      */
-    adding: ({ item: entity }) => this.emit('add-entity', { entity }),
+    adding: ({ item: entity }) => this.emit({ type: 'add-entity', entity }),
 
     /**
      * Emit callback after adding an entity and registering it in the current hierarchy
@@ -119,7 +119,7 @@ export class Entity extends Observable<EntityEventMap> {
         throw new Error(`tried to add entity to multiple containers`);
       }
       entity.parent = this;
-      this.emit('entity-added', { entity });
+      this.emit({ type: 'entity-added', entity });
     },
 
     /**
@@ -129,7 +129,7 @@ export class Entity extends Observable<EntityEventMap> {
      * @returns Nothing
      */
     removing: ({ item: entity }) => {
-      this.emit('remove-entity', { entity });
+      this.emit({ type: 'remove-entity', entity });
       entity.parent = undefined;
     },
     /**
@@ -137,7 +137,7 @@ export class Entity extends Observable<EntityEventMap> {
      *
      * @param entity - That was just removed
      */
-    removed: ({ item: entity }) => this.emit('entity-removed', { entity }),
+    removed: ({ item: entity }) => this.emit({ type: 'entity-removed', entity }),
   });
 
   /**
@@ -160,7 +160,7 @@ export class Entity extends Observable<EntityEventMap> {
         if (!('components' in entity)) continue;
 
         for (const component of entity.components) {
-          component.emit('added-to-hierarchy', {});
+          component.emit({ type: 'added-to-hierarchy' });
         }
       }
     }
@@ -254,7 +254,7 @@ export class Entity extends Observable<EntityEventMap> {
      * @param component - To be added
      * @returns Nothing
      */
-    adding: ({ item: component }) => this.emit('add-component', { component }),
+    adding: ({ item: component }) => this.emit({ type: 'add-component', component }),
     /**
      * Emit callback after adding a component, emitting hierarchy callbacks on it and adding
      * assigning its entity relation
@@ -267,11 +267,11 @@ export class Entity extends Observable<EntityEventMap> {
         component.entity = this;
         // when already in root hierarchy, initialize
         if (this.application) {
-          component.emit('added-to-hierarchy', {});
+          component.emit({ type: 'added-to-hierarchy' });
         }
       }
 
-      this.emit('component-added', { component });
+      this.emit({ type: 'component-added', component });
     },
     /**
      * Emit callback before removing a component, emitting hierarchy callbacks on it and removing
@@ -281,8 +281,8 @@ export class Entity extends Observable<EntityEventMap> {
      * @returns Nothing
      */
     removing: ({ item: component }) => {
-      this.emit('remove-component', { component });
-      component.emit('removed-from-hierarchy', {});
+      this.emit({ type: 'remove-component', component });
+      component.emit({ type: 'removed-from-hierarchy' });
       component.entity = undefined;
     },
     /**
@@ -291,7 +291,7 @@ export class Entity extends Observable<EntityEventMap> {
      * @param component - That was removed
      * @returns Nothing
      */
-    removed: ({ item: component }) => this.emit('component-removed', { component }),
+    removed: ({ item: component }) => this.emit({ type: 'component-removed', component }),
   });
 
   /**
