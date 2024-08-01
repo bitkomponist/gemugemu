@@ -1,5 +1,6 @@
 import { Entity } from './entity';
 import { getInjectableType, InjectableType } from './injection';
+import { Observable, ObservableEventMap } from './observable';
 import { System } from './system';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -92,7 +93,12 @@ export function entityLookup(path: string): PropertyDecorator {
   };
 }
 
-export abstract class Component {
+export type ComponentEventMap = ObservableEventMap & {
+  'added-to-hierarchy': object;
+  'removed-from-hierarchy': object;
+};
+
+export abstract class Component extends Observable<ComponentEventMap> {
   /**
    * Optional callback called when the component is first fully added to the hierarchy (parent and
    * application are set)
@@ -137,7 +143,10 @@ export abstract class Component {
    *
    * @param props - Configuration to set on this component
    */
-  constructor(props?: Parameters<typeof this.set>[0]) {
+  constructor(props?: object) {
+    super();
+    this.on('added-to-hierarchy', this.onAddedToHierarchy.bind(this));
+    this.on('removed-from-hierarchy', this.onRemovedFromHierarchy.bind(this));
     props && this.set(props);
   }
 
@@ -190,13 +199,13 @@ export abstract class Component {
   }
 
   /** Internal flag to track if this component was initialized upon beeing added to the hierarchy */
-  private initialized: boolean = false;
+  protected initialized: boolean = false;
 
   /**
-   * Public callback upon beeing added to hierarchy, first resolves dependencies, then executes
+   * Private callback upon beeing added to hierarchy, first resolves dependencies, then executes
    * internal init callback
    */
-  onAddedToHierarchy() {
+  protected onAddedToHierarchy() {
     if (this.initialized) {
       return;
     }
@@ -206,8 +215,8 @@ export abstract class Component {
     this.init?.();
   }
 
-  /** Public callback upon beeing removed from hierarchy */
-  onRemovedFromHierarchy() {
+  /** Private callback upon beeing removed from hierarchy */
+  protected onRemovedFromHierarchy() {
     this.initialized = false;
     this.destroy?.();
   }

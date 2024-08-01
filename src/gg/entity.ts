@@ -87,11 +87,11 @@ export class Entity extends Observable<EntityEventMap> {
 
     if (parent && this.application) {
       for (const component of this.components) {
-        component.onAddedToHierarchy();
+        component.emit('added-to-hierarchy', {});
       }
     } else if (!parent) {
       for (const component of this.components) {
-        component.onRemovedFromHierarchy();
+        component.emit('removed-from-hierarchy', {});
       }
     }
   }
@@ -159,8 +159,8 @@ export class Entity extends Observable<EntityEventMap> {
       for (const entity of this.getGrandChildren()) {
         if (!('components' in entity)) continue;
 
-        for (const comp of entity.components) {
-          comp.onAddedToHierarchy();
+        for (const component of entity.components) {
+          component.emit('added-to-hierarchy', {});
         }
       }
     }
@@ -267,7 +267,7 @@ export class Entity extends Observable<EntityEventMap> {
         component.entity = this;
         // when already in root hierarchy, initialize
         if (this.application) {
-          component.onAddedToHierarchy();
+          component.emit('added-to-hierarchy', {});
         }
       }
 
@@ -282,7 +282,7 @@ export class Entity extends Observable<EntityEventMap> {
      */
     removing: ({ item: component }) => {
       this.emit('remove-component', { component });
-      component.onRemovedFromHierarchy();
+      component.emit('removed-from-hierarchy', {});
       component.entity = undefined;
     },
     /**
