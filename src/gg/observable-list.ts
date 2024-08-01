@@ -1,3 +1,5 @@
+import { Observer, ObserverSubscribption } from './observer';
+
 /** Object of supported observable list callbacks */
 export type ListObserver<T = unknown> = {
   adding?(item: T, target: ObservableList<T>): void;
@@ -6,29 +8,38 @@ export type ListObserver<T = unknown> = {
   removed?(item: T, target: ObservableList<T>): void;
 };
 
+type ObservableListEventMap<T = unknown> = {
+  adding: { item: T; target: ObservableList<T> };
+  added: { item: T; target: ObservableList<T> };
+  removing: { item: T; target: ObservableList<T> };
+  removed: { item: T; target: ObservableList<T> };
+};
+
 /**
  * List class with a subset of array methods and the ability to observe when elements are added or
  * removed
  */
 export class ObservableList<T = unknown> {
+  private _observer = new Observer<ObservableListEventMap<T>>();
+
+  get observer() {
+    return this._observer;
+  }
+
   /** Internal storage of the list items */
   private items: T[] = [];
 
   /**
    * Get a observable list instance
    *
-   * @param observer - Object containing event handlers
-   * @param initialItems - Initial state of the list
+   * @param observers - Initial Event subscriptions
    * @param distinct - Wether to allow each item only once in the array
    */
   constructor(
-    private observer?: ListObserver<T>,
-    initialItems: T[] = [],
+    observers?: ObserverSubscribption<ObservableListEventMap<T>>,
     private distinct = true,
   ) {
-    for (const item of initialItems) {
-      this.add(item);
-    }
+    observers && this.observer.subscribe(observers);
   }
 
   /**
@@ -43,9 +54,9 @@ export class ObservableList<T = unknown> {
         continue;
       }
 
-      this.observer?.adding?.(item, this);
+      this.observer.emit('adding', { item, target: this });
       this.items.push(item);
-      this.observer?.added?.(item, this);
+      this.observer.emit('added', { item, target: this });
     }
 
     return this;
@@ -120,9 +131,9 @@ export class ObservableList<T = unknown> {
 
     const item = this.items[index];
 
-    this.observer?.removing?.(item, this);
+    this.observer.emit('removing', { item, target: this });
     this.items.splice(index, 1);
-    this.observer?.removed?.(item, this);
+    this.observer.emit('removed', { item, target: this });
 
     return this;
   }

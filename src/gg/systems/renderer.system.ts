@@ -3,7 +3,6 @@ import { Injectable } from '@gg/injection';
 import Stats from 'three/addons/libs/stats.module.js';
 import { Camera, Scene, WebGLRenderer } from 'three/src/Three.js';
 import { Entity } from '../entity';
-import { EntityContainer } from '../entity-container';
 import { System } from '../system';
 
 export
@@ -34,13 +33,13 @@ class RendererSystem extends System {
     });
   }
 
-  initRoot(root: EntityContainer): void {
+  initRoot(root: Entity): void {
     const { scene } = this;
     while (scene.children.length) {
       scene.remove(scene.children[0]);
     }
 
-    function addEntityToScene(entity: Entity | EntityContainer) {
+    function addEntityToScene(entity: Entity | Entity) {
       if (entity instanceof Entity) {
         const transform = entity.getComponent(TransformComponent);
         if (transform && !scene.children.includes(transform.object3d)) {
@@ -49,7 +48,7 @@ class RendererSystem extends System {
       }
     }
 
-    function removeEntityFromScene(entity: Entity | EntityContainer) {
+    function removeEntityFromScene(entity: Entity | Entity) {
       if (entity instanceof Entity) {
         const transform = entity.getComponent(TransformComponent);
         if (transform && scene.children.includes(transform.object3d)) {
@@ -67,7 +66,7 @@ class RendererSystem extends System {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  destructRoot(_root: EntityContainer): void {
+  destructRoot(_root: Entity): void {
     /** @todo Implement scene unloading */
   }
 

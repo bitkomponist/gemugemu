@@ -1,6 +1,5 @@
 import '@gg/registry';
 import { Entity, EntityDescriptor } from './entity';
-import { EntityContainer } from './entity-container';
 import { System, SystemDescriptor } from './system';
 import { ComponentManagerSystem } from './systems/component-manager.system';
 import { InputManagerSystem } from './systems/input-manager.system';
@@ -47,7 +46,7 @@ export class Application {
    * @returns Application
    */
   static fromDescriptor({ systems = [], root: rootDescriptor }: ApplicationDescriptor) {
-    const root = new EntityContainer();
+    const root = new Entity('$root');
     if (rootDescriptor) {
       root.entities.add(...rootDescriptor.entities.map((d) => Entity.fromDescriptor(d)));
     }
@@ -58,10 +57,10 @@ export class Application {
   }
 
   /** Internal reference to the current root container */
-  private _root?: EntityContainer;
+  private _root?: Entity;
 
   /** Sets the current root container and initializes the app's systems with it */
-  set root(root: EntityContainer | undefined) {
+  set root(root: Entity | undefined) {
     this._root = root;
     if (root) {
       root.application = this;
@@ -84,7 +83,7 @@ export class Application {
    * @param autostart - If a root container was provided, start the application immediately
    */
   constructor(
-    root?: EntityContainer,
+    root?: Entity,
     public systems?: System[],
     autostart = true,
   ) {

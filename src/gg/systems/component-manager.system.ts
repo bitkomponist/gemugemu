@@ -1,6 +1,6 @@
 import { Component } from '@gg/component';
 import { Injectable } from '@gg/injection';
-import { EntityContainer } from '../entity-container';
+import { Entity } from '../entity';
 import { System } from '../system';
 
 export interface LifecycleComponent {
@@ -17,7 +17,7 @@ class ComponentManagerSystem extends System {
   private dirty = true;
   private updateables: Component[] = [];
 
-  updateRoot(root: EntityContainer, delta: number): void {
+  updateRoot(root: Entity, delta: number): void {
     this.dirty = true;
     this.updateComponentLists(root);
     for (const component of this.updateables) {
@@ -25,7 +25,7 @@ class ComponentManagerSystem extends System {
     }
   }
 
-  updateComponentLists(root: EntityContainer) {
+  updateComponentLists(root: Entity) {
     if (!this.dirty) {
       return;
     }

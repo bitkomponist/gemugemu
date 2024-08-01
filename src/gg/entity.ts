@@ -1,7 +1,8 @@
+import { Application } from './application';
 import { Component, ComponentDescriptor } from './component';
-import { EntityContainer, EntityContainerItem } from './entity-container';
 import { getInjectableType, InjectableType } from './injection';
 import { ObservableList } from './observable-list';
+import { Observer, ObserverEventMap } from './observer';
 import { Prefab } from './prefab';
 import { System } from './system';
 
@@ -13,40 +14,71 @@ export type EntityDescriptor = {
   entities?: EntityDescriptor[];
 };
 
-/** Counter used when autogenerating entity id's */
-let entityCount = 0;
-export class Entity extends EntityContainer {
+export type EntityEventMap = ObserverEventMap & {
+  /**
+   * Invoked before a entity will be added
+   *
+   * @param entity - That was will be added
+   */
+  'add-entity': { entity: Entity };
+  /**
+   * Invoked after a entity was added
+   *
+   * @param entity - That was just added
+   */
+  'entity-added': { entity: Entity };
+  /**
+   * Invoked before a entity will be removed
+   *
+   * @param entity - That was will be removed
+   */
+  'remove-entity': { entity: Entity };
+  /**
+   * Invoked after a entity was removed
+   *
+   * @param entity - That was just removed
+   */
+  'entity-removed': { entity: Entity };
+
   /**
    * Invoked before a component will be added
    *
    * @param component - That was will be added
    */
-  onAddComponent?(component: Component): void;
+  'add-component': { component: Component };
   /**
    * Invoked after a component was added
    *
    * @param component - That was just added
    */
-  onComponentAdded?(component: Component): void;
+  'component-added': { component: Component };
   /**
    * Invoked before a component will be removed
    *
    * @param component - That was will be removed
    */
-  onRemoveComponent?(component: Component): void;
+  'remove-component': { component: Component };
   /**
    * Invoked after a component was removed
    *
    * @param component - That was just removed
    */
-  onComponentRemoved?(component: Component): void;
+  'component-removed': { component: Component };
+};
 
+/** Counter used when autogenerating entity id's */
+let entityCount = 0;
+export class Entity extends Observer<EntityEventMap> {
+  /** Reference to the parent container object (undefined if this is the root) */
+  protected _parent?: Entity;
+
+  /** Get the current parent container (undefined if this is the root) */
   get parent() {
     return this._parent;
   }
 
   /** Set the parent container and emit hierarchy callbacks */
-  set parent(parent: EntityContainer | undefined) {
+  set parent(parent: Entity | undefined) {
     if (parent === this._parent) {
       return;
     }
@@ -62,6 +94,96 @@ export class Entity extends EntityContainer {
         component.onRemovedFromHierarchy();
       }
     }
+  }
+
+  /** Reference to the application which this container belongs to its hierarchy */
+  private _application?: Application;
+
+  /** List of children of this container, with observers to react to adding and removing of items */
+  private _entities = new ObservableList<Entity>({
+    /**
+     * Emit callback before adding an entity
+     *
+     * @param entity - To be added
+     * @returns Nothing
+     */
+    adding: ({ item: entity }) => this.emit('add-entity', { entity }),
+
+    /**
+     * Emit callback after adding an entity and registering it in the current hierarchy
+     *
+     * @param entity - That was just added
+     */
+    added: ({ item: entity }) => {
+      if (entity.parent && entity.parent !== this) {
+        throw new Error(`tried to add entity to multiple containers`);
+      }
+      entity.parent = this;
+      this.emit('entity-added', { entity });
+    },
+
+    /**
+     * Emit callback before removing an entity and removing it from the current hierarchy
+     *
+     * @param entity - To be removed
+     * @returns Nothing
+     */
+    removing: ({ item: entity }) => {
+      this.emit('remove-entity', { entity });
+      entity.parent = undefined;
+    },
+    /**
+     * Emit callback after removing an entity
+     *
+     * @param entity - That was just removed
+     */
+    removed: ({ item: entity }) => this.emit('entity-removed', { entity }),
+  });
+
+  /**
+   * Set the application to which hierarchy this container belongs. Should the application exist, also
+   * initializes all child components deeply nested in this container.
+   */
+  set application(application: Application | undefined) {
+    const prev = this.application;
+
+    // recursively set reference to application on root
+    if (this.parent) {
+      this.parent.application = application;
+    } else {
+      // this is root, so set application here
+      this._application = application;
+    }
+
+    if (!prev && application) {
+      for (const entity of this.getGrandChildren()) {
+        if (!('components' in entity)) continue;
+
+        for (const comp of entity.components) {
+          comp.onAddedToHierarchy();
+        }
+      }
+    }
+  }
+
+  /** Get the current application this container is part of */
+  get application() {
+    return this.parent ? this.parent.application : this._application;
+  }
+
+  /** Get observable list of entities in this container */
+  get entities() {
+    return this._entities;
+  }
+
+  /** Gather all deeply nested components which are (grand-)parented by this container */
+  getGrandChildren() {
+    const result: Entity[] = [];
+    for (const child of this._entities) {
+      result.push(child);
+      result.push(...child.getGrandChildren());
+    }
+    return result;
   }
 
   /**
@@ -132,7 +254,7 @@ export class Entity extends EntityContainer {
      * @param component - To be added
      * @returns Nothing
      */
-    adding: (component) => this.onAddComponent?.(component),
+    adding: ({ item: component }) => this.emit('add-component', { component }),
     /**
      * Emit callback after adding a component, emitting hierarchy callbacks on it and adding
      * assigning its entity relation
@@ -140,7 +262,7 @@ export class Entity extends EntityContainer {
      * @param component - That was added
      * @returns Nothing
      */
-    added: (component) => {
+    added: ({ item: component }) => {
       if (component instanceof Component) {
         component.entity = this;
         // when already in root hierarchy, initialize
@@ -149,7 +271,7 @@ export class Entity extends EntityContainer {
         }
       }
 
-      this.onComponentAdded?.(component);
+      this.emit('component-added', { component });
     },
     /**
      * Emit callback before removing a component, emitting hierarchy callbacks on it and removing
@@ -158,8 +280,8 @@ export class Entity extends EntityContainer {
      * @param component - That will be removed
      * @returns Nothing
      */
-    removing: (component) => {
-      this.onRemoveComponent?.(component);
+    removing: ({ item: component }) => {
+      this.emit('remove-component', { component });
       component.onRemovedFromHierarchy();
       component.entity = undefined;
     },
@@ -169,7 +291,7 @@ export class Entity extends EntityContainer {
      * @param component - That was removed
      * @returns Nothing
      */
-    removed: (component) => this.onComponentRemoved?.(component),
+    removed: ({ item: component }) => this.emit('component-removed', { component }),
   });
 
   /**
@@ -182,7 +304,7 @@ export class Entity extends EntityContainer {
   constructor(
     public readonly id: string,
     components: Component[] = [],
-    entities: EntityContainerItem[] = [],
+    entities: Entity[] = [],
   ) {
     super();
     this.entities.add(...entities);

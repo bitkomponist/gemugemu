@@ -1,5 +1,5 @@
 import { Application } from './application';
-import { EntityContainer } from './entity-container';
+import { Entity } from './entity';
 import { getInjectableType } from './injection';
 
 /** Base class for systems that are instantiated once per application */
@@ -9,20 +9,20 @@ export class System {
    *
    * @param root - Entitycontainer that resembles the hierarchy root of this application
    */
-  initRoot?(root: EntityContainer): void;
+  initRoot?(root: Entity): void;
   /**
    * Optional callback to run when an application's update loop is invoked
    *
    * @param root - Entitycontainer that resembles the hierarchy root of this application
    * @param delta - Time between this and the last update loops execution
    */
-  updateRoot?(root: EntityContainer, delta: number): void;
+  updateRoot?(root: Entity, delta: number): void;
   /**
    * Optional callback to run when a applications root entitycontainer is removed
    *
    * @param root - Entitycontainer that resembles the hierarchy root of this application
    */
-  destructRoot?(root: EntityContainer): void;
+  destructRoot?(root: Entity): void;
 
   /** Internal reference to the parent application */
   private _application?: Application;
