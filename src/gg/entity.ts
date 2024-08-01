@@ -1,8 +1,8 @@
 import { Application } from './application';
 import { Component, ComponentDescriptor } from './component';
 import { getInjectableType, InjectableType } from './injection';
+import { Observable, ObservableEventMap } from './observable';
 import { ObservableList } from './observable-list';
-import { Observer, ObserverEventMap } from './observer';
 import { Prefab } from './prefab';
 import { System } from './system';
 
@@ -14,7 +14,7 @@ export type EntityDescriptor = {
   entities?: EntityDescriptor[];
 };
 
-export type EntityEventMap = ObserverEventMap & {
+export type EntityEventMap = ObservableEventMap & {
   /**
    * Invoked before a entity will be added
    *
@@ -68,7 +68,7 @@ export type EntityEventMap = ObserverEventMap & {
 
 /** Counter used when autogenerating entity id's */
 let entityCount = 0;
-export class Entity extends Observer<EntityEventMap> {
+export class Entity extends Observable<EntityEventMap> {
   /** Reference to the parent container object (undefined if this is the root) */
   protected _parent?: Entity;
 
@@ -141,8 +141,8 @@ export class Entity extends Observer<EntityEventMap> {
   });
 
   /**
-   * Set the application to which hierarchy this container belongs. Should the application exist, also
-   * initializes all child components deeply nested in this container.
+   * Set the application to which hierarchy this container belongs. Should the application exist,
+   * also initializes all child components deeply nested in this container.
    */
   set application(application: Application | undefined) {
     const prev = this.application;

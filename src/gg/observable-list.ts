@@ -1,4 +1,4 @@
-import { Observer, ObserverSubscribption } from './observer';
+import { Observable, ObserverEventSubscription } from './observable';
 
 /** Object of supported observable list callbacks */
 export type ListObserver<T = unknown> = {
@@ -20,7 +20,7 @@ type ObservableListEventMap<T = unknown> = {
  * removed
  */
 export class ObservableList<T = unknown> {
-  private _observer = new Observer<ObservableListEventMap<T>>();
+  private _observer = new Observable<ObservableListEventMap<T>>();
 
   get observer() {
     return this._observer;
@@ -36,7 +36,7 @@ export class ObservableList<T = unknown> {
    * @param distinct - Wether to allow each item only once in the array
    */
   constructor(
-    observers?: ObserverSubscribption<ObservableListEventMap<T>>,
+    observers?: ObserverEventSubscription<ObservableListEventMap<T>>,
     private distinct = true,
   ) {
     observers && this.observer.subscribe(observers);
