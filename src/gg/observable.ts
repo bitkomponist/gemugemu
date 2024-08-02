@@ -11,7 +11,10 @@ export type ObserverEventSubscription<TEventMap extends ObservableEventMap> = {
 };
 
 export class Observable<TEventMap extends ObservableEventMap = ObservableEventMap> {
-  private _observers?: Map<keyof TEventMap, Set<ObserverEventListener<TEventMap, keyof TEventMap>>>;
+  private _observers?: Map<
+    string | number | symbol,
+    Set<ObserverEventListener<TEventMap, keyof TEventMap>>
+  >;
   on<K extends keyof TEventMap>(type: K, observer: ObserverEventListener<TEventMap, K>) {
     this._observers ??= new Map();
     if (!this._observers.has(type)) {

@@ -157,8 +157,6 @@ export class Entity extends Observable<EntityEventMap> {
 
     if (!prev && application) {
       for (const entity of this.getGrandChildren()) {
-        if (!('components' in entity)) continue;
-
         for (const component of entity.components) {
           component.emit({ type: 'added-to-hierarchy' });
         }
@@ -323,10 +321,32 @@ export class Entity extends Observable<EntityEventMap> {
    * @returns Instance of ctor if found
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getComponent<T extends Component>(ctor: new (...args: any[]) => T) {
-    return this.components.find((component): component is T => component instanceof ctor) as
-      | T
-      | undefined;
+  getComponents<T>(ctor: new (...args: any[]) => T, recursive = false) {
+    const result = new Set<T>();
+    for (const entity of recursive ? this.getGrandChildren() : [this]) {
+      for (const component of entity.components) {
+        if (component instanceof ctor) {
+          result.add(component);
+        }
+      }
+    }
+
+    return [...result];
+  }
+
+  /**
+   * Finds the first component instance on this entity, that is instance of ctor
+   *
+   * @param ctor - Target components class
+   * @returns Instance of ctor if found
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getComponent<T>(ctor: new (...args: any[]) => T) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (this.components as any).find(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (component: any): component is T => component instanceof ctor,
+    ) as T | undefined;
   }
 
   /**
@@ -337,7 +357,7 @@ export class Entity extends Observable<EntityEventMap> {
    * @returns Instance of ctor
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  requireComponent<T extends Component>(ctor: new (...args: any[]) => T) {
+  requireComponent<T>(ctor: new (...args: any[]) => T) {
     const component = this.getComponent(ctor);
     if (!component) {
       throw new Error(`Entity ${this.id} required missing component of type ${ctor.name}`);

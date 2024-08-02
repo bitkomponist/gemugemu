@@ -98,7 +98,9 @@ export type ComponentEventMap = ObservableEventMap & {
   'removed-from-hierarchy': object;
 };
 
-export abstract class Component extends Observable<ComponentEventMap> {
+export abstract class Component<
+  TEventMap extends ComponentEventMap = ComponentEventMap,
+> extends Observable<TEventMap> {
   /**
    * Optional callback called when the component is first fully added to the hierarchy (parent and
    * application are set)
@@ -272,7 +274,7 @@ export abstract class Component extends Observable<ComponentEventMap> {
    * @param props - Partial props of this component
    * @returns Self
    */
-  set(props: Partial<typeof this>) {
+  set(props: object) {
     Object.assign(this, props);
     return this;
   }
