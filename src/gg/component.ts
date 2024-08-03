@@ -38,7 +38,7 @@ function getComponentInstanceById<T extends Component>(name: string, props: Part
 }
 
 /** Registry for component properties to inject siblings into */
-const siblingMap = new Map<object, Map<string | symbol, InjectableType<Component>>>();
+const siblingMap = new Map<object, Map<string | symbol, InjectableType>>();
 
 /**
  * Decorator to inject references to sibling components into the targeted component class property
@@ -54,7 +54,7 @@ const siblingMap = new Map<object, Map<string | symbol, InjectableType<Component
  * @param type - Component class to search for in the siblings of the target component
  * @returns Decorated component class property
  */
-export function sibling(type: InjectableType<Component>): PropertyDecorator {
+export function sibling(type: InjectableType): PropertyDecorator {
   return (object, key) => {
     const target = object.constructor;
     if (!siblingMap.has(target)) {
