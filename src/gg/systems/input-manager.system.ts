@@ -22,6 +22,7 @@ class InputManagerSystem extends System {
   };
 
   private onKeyDown = (e: KeyboardEvent) => {
+    console.log(e.key);
     this.state.set(e.key, true);
   };
 

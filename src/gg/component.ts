@@ -110,6 +110,13 @@ export abstract class Component<
   /** Optional callback called when the component is removed from the hierarchy */
   destroy?(): void;
 
+  /** Component ready state handling */
+  private _resolveReady?: (value: void | PromiseLike<void>) => void;
+  private _readyPromise = new Promise<void>((resolve) => (this._resolveReady = resolve));
+  get ready() {
+    return this._readyPromise;
+  }
+
   /**
    * Create a component instance based on a given configuration
    *
@@ -215,6 +222,7 @@ export abstract class Component<
     this.resolveSiblings();
     this.resolveEntityLookups();
     this.init?.();
+    this._resolveReady?.();
   }
 
   /** Private callback upon beeing removed from hierarchy */
