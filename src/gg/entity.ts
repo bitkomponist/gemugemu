@@ -77,6 +77,17 @@ export class Entity extends Observable<EntityEventMap> {
     return this._parent;
   }
 
+  get path() {
+    const path: string[] = [this.id];
+    let currentParent = this.parent;
+    while (currentParent && currentParent.id !== '$root') {
+      path.push(currentParent.id);
+      currentParent = currentParent.parent;
+    }
+
+    return `/${path.reverse().join('/')}`;
+  }
+
   /** Set the parent container and emit hierarchy callbacks */
   set parent(parent: Entity | undefined) {
     if (parent === this._parent) {

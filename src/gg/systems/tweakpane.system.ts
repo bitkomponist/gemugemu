@@ -24,7 +24,8 @@ class TweakpaneSystem extends System {
       this.entityFolderMap.set(
         entity,
         this.pane.addFolder({
-          title: `#${entity.id}`,
+          title: entity.path,
+          expanded: false,
         }),
       );
     }

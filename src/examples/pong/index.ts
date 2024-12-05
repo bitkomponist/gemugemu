@@ -1,5 +1,5 @@
 import { Application } from '@gg/application';
-import { Component, ComponentEventMap, entityLookup, sibling } from '@gg/component';
+import { bindUi, Component, ComponentEventMap, entityLookup, sibling } from '@gg/component';
 import { TextSpriteComponent } from '@gg/components/text-sprite.component';
 import { Entity, EntityDescriptor } from '@gg/entity';
 import { Injectable } from '@gg/injection';
@@ -16,7 +16,7 @@ export class ScoreUiComponent extends Component {
 
   _score = 0;
 
-  racketPath?: string;
+  @bindUi() racketPath?: string;
   racket?: PongRacket;
 
   get score() {
