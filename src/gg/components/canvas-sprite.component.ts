@@ -1,11 +1,10 @@
-import { Component, sibling } from '@gg/component';
 import { Injectable } from '@gg/injection';
 import { CanvasTexture } from 'three/src/Three.js';
 import { SpriteComponent } from './sprite.component';
 
 export
 @Injectable()
-class CanvasSpriteComponent extends Component {
+class CanvasSpriteComponent extends SpriteComponent {
   private _size = 128;
   get size() {
     return this._size;
@@ -26,16 +25,26 @@ class CanvasSpriteComponent extends Component {
     return this._domElement!;
   }
 
-  @sibling(SpriteComponent) sprite!: SpriteComponent;
+  private setNeedsUpdate() {
+    if (this.spriteMaterial) {
+      this.spriteMaterial.needsUpdate = true;
+    }
+    if (this.map) {
+      this.map.needsUpdate = true;
+    }
+  }
 
   resize() {
     const { _domElement } = this;
     if (!_domElement) return;
     _domElement.width = this._size;
     _domElement.height = this._size;
-    if (this?.sprite?.spriteMaterial) {
-      this.sprite.spriteMaterial.needsUpdate = true;
-    }
+    this.setNeedsUpdate();
+  }
+
+  draw(composer: (canvas: CanvasSpriteComponent) => void) {
+    composer(this);
+    this.setNeedsUpdate();
   }
 
   private _context?: CanvasRenderingContext2D;
@@ -52,6 +61,7 @@ class CanvasSpriteComponent extends Component {
   }
 
   async init() {
-    this.sprite.map = new CanvasTexture(this.domElement);
+    await super.init();
+    this.map = new CanvasTexture(this.domElement);
   }
 }

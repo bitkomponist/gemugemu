@@ -15,10 +15,12 @@ export class PongRacket extends Component {
   speed = 0.1;
   dampening = 1;
   impulse = 0;
+  score = 0;
   @sibling(TransformComponent) transform!: TransformComponent;
   @sibling(CanvasSpriteComponent) canvas!: CanvasSpriteComponent;
 
   reset() {
+    this.score = 0;
     this.transform.position.copy(this.initialPosition);
     this.positionTarget.copy(this.initialPosition);
   }
@@ -74,7 +76,6 @@ export class PongRacketPrefab extends Prefab {
       id: 'pong-racket',
       components: [
         { type: 'TransformComponent', position },
-        { type: 'SpriteComponent' },
         { type: 'CanvasSpriteComponent' },
         { type: Collider.name, hitbox: { x: 0.25, y: 1, z: 0 } },
         { type: PongRacket.name },

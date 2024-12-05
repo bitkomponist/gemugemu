@@ -25,6 +25,12 @@ export class PongBall extends Component<PongBallEventMap> {
   paused = false;
   bounds = new Vector3(10, 2, 0);
 
+  init(): void {
+    this.draw();
+    this.collider.on('collision', ({ target }) => this.onRacketHit(target));
+    this.reset();
+  }
+
   reset(direction = Math.random() > 0.5 ? -1 : 1) {
     this.transform.position.set(0, 0, 0);
     this.direction.set(direction, -0.25 + Math.random() * 0.5, 0);
@@ -32,7 +38,7 @@ export class PongBall extends Component<PongBallEventMap> {
     this.paused = false;
   }
 
-  init(): void {
+  draw() {
     const { context, size } = this.canvas;
     // context.fillStyle = '#111111';
     // context.fillRect(0, 0, this.canvas.size, this.canvas.size);
@@ -41,29 +47,32 @@ export class PongBall extends Component<PongBallEventMap> {
     context.arc(size / 2, size / 2, size / 2, 0, 2 * Math.PI, false);
     context.closePath();
     context.fill();
+  }
 
-    this.reset();
-
-    this.collider.on('collision', () => {
-      this.direction.x *= -1;
-      this.currentSpeed += 0.0001;
-    });
+  onRacketHit(target: Collider) {
+    this.direction.x *= -1;
+    const targetTransform = target.requireComponent(TransformComponent);
+    const racketHalfHeight = 0;
+    const steepness = Math.abs(
+      targetTransform.position.y - this.transform.position.y - racketHalfHeight,
+    );
+    this.direction.y *= steepness * 25;
+    this.direction.y = Math.min(2, Math.max(-2, this.direction.y));
+    this.currentSpeed += 0.0001;
   }
 
   update(delta: number) {
     if (this.paused) {
       return;
     }
-
     const { position } = this.transform;
-
     this.posUpdate.copy(this.direction).multiplyScalar(this.currentSpeed * delta);
 
     const targetX = position.x + this.posUpdate.x;
 
     if (targetX > this.bounds.x || targetX < this.bounds.x * -1) {
-      this.emit({ type: 'out-of-bounds', side: targetX < 0 ? 'left' : 'right' });
       this.paused = true;
+      this.emit({ type: 'out-of-bounds', side: targetX < 0 ? 'left' : 'right' });
     }
 
     if (
