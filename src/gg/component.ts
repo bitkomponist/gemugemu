@@ -1,7 +1,9 @@
+import { BindingParams, FolderApi } from 'tweakpane';
 import { Entity } from './entity';
 import { getInjectableType, InjectableType } from './injection';
 import { Observable, ObservableEventMap } from './observable';
 import { System } from './system';
+import { TweakpaneSystem } from './systems/tweakpane.system';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ComponentDescriptor<T extends Component = any> = { type: string } & Partial<T>;
@@ -90,6 +92,34 @@ export function entityLookup(path: string): PropertyDecorator {
       entityLookupMap.set(target, new Map());
     }
     entityLookupMap.get(target)?.set(key, path);
+  };
+}
+
+/** Registry for component properties to inject siblings into */
+const bindUiMap = new Map<object, Map<string | symbol, BindingParams>>();
+
+/**
+ * Decorator to make component props controllable via ui
+ *
+ * @example
+ *
+ * ```
+ * class Mycomponent {
+ *   @bindUi({ min: 0, max: 1 }) transform!: TransformComponent;
+ * }
+ * ```
+ *
+ * @param params - Ui properties
+ * @returns Decorated component class property
+ * @see https://tweakpane.github.io/docs/input-bindings
+ */
+export function bindUi(params: BindingParams = {}): PropertyDecorator {
+  return (object, key) => {
+    const target = object.constructor;
+    if (!bindUiMap.has(target)) {
+      bindUiMap.set(target, new Map());
+    }
+    bindUiMap.get(target)?.set(key, params);
   };
 }
 
@@ -222,6 +252,7 @@ export abstract class Component<
     this.resolveSiblings();
     this.resolveEntityLookups();
     this.init?.();
+    this.bindUiComponents();
     this._resolveReady?.();
   }
 
@@ -290,5 +321,56 @@ export abstract class Component<
   /** Get the root application of which's hierarchy this component is part of */
   get application() {
     return this.entity?.application;
+  }
+
+  /**
+   * Should construct a Tweakpane Folder containing bindings for this component
+   *
+   * @returns Tweakpane controls for this component
+   */
+  private initUiComponents(entityFolder: FolderApi) {
+    const selfType = this.constructor as InjectableType<Component>;
+    const props = bindUiMap.get(selfType);
+
+    if (!props) {
+      return;
+    }
+
+    const folder = entityFolder.addFolder({ title: selfType.name });
+
+    for (const [prop, params] of props.entries()) {
+      folder.addBinding(this, prop as keyof this, params);
+    }
+
+    this.initUiComponentsFolder?.(folder);
+
+    return () => {
+      entityFolder.remove(folder);
+    };
+  }
+
+  /** Additionally modify ui components folder */
+  initUiComponentsFolder?(folder: FolderApi): void;
+
+  private bindUiComponents() {
+    const tweakpaneSystem = this.getSystem(TweakpaneSystem);
+
+    if (!tweakpaneSystem) {
+      return;
+    }
+
+    const folder = tweakpaneSystem.requireEntityFolder(this.entity);
+
+    const destructor = this.initUiComponents(folder);
+
+    folder.hidden = !folder.children.length;
+
+    const destructOnce = () => {
+      destructor?.();
+      this.off('removed-from-hierarchy', destructOnce);
+      tweakpaneSystem.cleanupEntityFolder(this.entity);
+    };
+
+    this.on('removed-from-hierarchy', destructOnce);
   }
 }

@@ -48,18 +48,6 @@ class RendererSystem extends System {
       }
     }
 
-    function removeEntityFromScene(entity: Entity | Entity) {
-      if (entity instanceof Entity) {
-        const transform = entity.getComponent(TransformComponent);
-        if (transform && scene.children.includes(transform.object3d)) {
-          scene.remove(transform.object3d);
-        }
-      }
-    }
-
-    root.onEntityRemoved = (entity) => removeEntityFromScene(entity);
-    root.onEntityAdded = (entity) => addEntityToScene(entity);
-
     for (const entity of root.entities) {
       addEntityToScene(entity);
     }

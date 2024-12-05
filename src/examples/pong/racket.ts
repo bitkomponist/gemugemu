@@ -1,4 +1,4 @@
-import { Component, sibling } from '@gg/component';
+import { bindUi, Component, sibling } from '@gg/component';
 import { CanvasSpriteComponent } from '@gg/components/canvas-sprite.component';
 import { TransformComponent } from '@gg/components/transform.component';
 import { EntityDescriptor } from '@gg/entity';
@@ -13,7 +13,7 @@ export class PongRacket extends Component {
   private positionTarget = new Vector3();
   private initialPosition = new Vector3();
   speed = 0.1;
-  dampening = 1;
+  @bindUi({ min: 0.1, max: 2 }) dampening = 1;
   impulse = 0;
   score = 0;
   @sibling(TransformComponent) transform!: TransformComponent;

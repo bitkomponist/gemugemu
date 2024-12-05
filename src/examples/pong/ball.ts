@@ -1,4 +1,4 @@
-import { Component, ComponentEventMap, sibling } from '@gg/component';
+import { bindUi, Component, ComponentEventMap, sibling } from '@gg/component';
 import { CanvasSpriteComponent } from '@gg/components/canvas-sprite.component';
 import { TransformComponent } from '@gg/components/transform.component';
 import { EntityDescriptor } from '@gg/entity';
@@ -19,11 +19,11 @@ export class PongBall extends Component<PongBallEventMap> {
   @sibling(TransformComponent) transform!: TransformComponent;
   @sibling(Collider) collider!: Collider;
   direction = new Vector3();
-  speed = 0.005;
+  @bindUi({ min: 0.001, max: 0.01 }) speed = 0.005;
   currentSpeed = this.speed;
   private posUpdate = new Vector3();
-  paused = false;
-  bounds = new Vector3(10, 2, 0);
+  @bindUi() paused = false;
+  @bindUi() bounds = new Vector3(10, 2, 0);
 
   init(): void {
     this.draw();

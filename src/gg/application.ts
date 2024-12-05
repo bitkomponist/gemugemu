@@ -5,6 +5,7 @@ import { ComponentManagerSystem } from './systems/component-manager.system';
 import { InputManagerSystem } from './systems/input-manager.system';
 import { RendererSystem } from './systems/renderer.system';
 import { ResourceManagerSystem } from './systems/resource-manager.system';
+import { TweakpaneSystem } from './systems/tweakpane.system';
 
 /** Interface with properties necessary to instantiate a application object */
 export type ApplicationDescriptor = {
@@ -37,6 +38,7 @@ export class Application {
     { type: ResourceManagerSystem.name },
     { type: RendererSystem.name },
     { type: InputManagerSystem.name },
+    { type: TweakpaneSystem.name },
   ];
 
   /**
