@@ -363,8 +363,6 @@ export abstract class Component<
 
     const destructor = this.initUiComponents(folder);
 
-    folder.hidden = !folder.children.length;
-
     const destructOnce = () => {
       destructor?.();
       this.off('removed-from-hierarchy', destructOnce);

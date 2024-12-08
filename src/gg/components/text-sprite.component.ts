@@ -1,3 +1,4 @@
+import { bindUi } from '@gg/component';
 import { Injectable } from '@gg/injection';
 import { CanvasSpriteComponent } from './canvas-sprite.component';
 
@@ -5,7 +6,7 @@ export
 @Injectable()
 class TextSpriteComponent extends CanvasSpriteComponent {
   private _text: string = '';
-  get text() {
+  @bindUi() get text() {
     return this._text;
   }
   set text(text: string) {

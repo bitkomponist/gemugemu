@@ -1,14 +1,14 @@
 import { Entity } from '@gg/entity';
 import { Injectable } from '@gg/injection';
 import { Euler, Object3D, Quaternion, Vector3, Vector3Like } from 'three/src/Three.js';
-import { Component } from '../component';
+import { bindUi, Component } from '../component';
 
 export
 @Injectable()
 class TransformComponent extends Component {
   public object3d = new Object3D();
 
-  get position(): Vector3 {
+  @bindUi() get position(): Vector3 {
     return this.object3d.position;
   }
 
@@ -16,7 +16,7 @@ class TransformComponent extends Component {
     this.object3d.position.copy(position);
   }
 
-  get scale() {
+  @bindUi() get scale() {
     return this.object3d.scale;
   }
 
@@ -24,7 +24,7 @@ class TransformComponent extends Component {
     this.object3d.scale.copy(scale);
   }
 
-  get rotation() {
+  @bindUi() get rotation() {
     return this.object3d.rotation;
   }
 
