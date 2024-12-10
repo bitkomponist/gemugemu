@@ -139,7 +139,9 @@ export class EntityTree extends HTMLElement {
             color: hsl(230, 7%, 75%);
             background: hsl(230, 7%, 17%);
             border-radius: 6px;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
+            max-height: 50vh;
+            overflow:auto;
           }
         </style>
         <slot></slot>
