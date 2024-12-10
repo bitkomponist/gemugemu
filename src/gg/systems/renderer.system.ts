@@ -1,7 +1,7 @@
 import { TransformComponent } from '@gg/components/transform.component';
 import { Injectable } from '@gg/injection';
 import Stats from 'three/addons/libs/stats.module.js';
-import { Camera, Scene, WebGLRenderer } from 'three/src/Three.js';
+import { ACESFilmicToneMapping, Camera, Scene, WebGLRenderer } from 'three/src/Three.js';
 import { Entity } from '../entity';
 import { System } from '../system';
 
@@ -26,6 +26,7 @@ class RendererSystem extends System {
     super();
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setPixelRatio(window.devicePixelRatio);
+    this.renderer.toneMapping = ACESFilmicToneMapping;
     this.container.appendChild(this.renderer.domElement);
     this.container.appendChild(this.stats.dom);
     window.addEventListener('resize', () => {
