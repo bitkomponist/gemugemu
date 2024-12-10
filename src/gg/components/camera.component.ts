@@ -1,4 +1,4 @@
-import { Component, sibling } from '@gg/component';
+import { bindUi, Component, sibling } from '@gg/component';
 import { Injectable } from '@gg/injection';
 import { RendererSystem } from '@gg/systems/renderer.system';
 import { PerspectiveCamera, Vector2 } from 'three/src/Three.js';
@@ -15,7 +15,7 @@ class CameraComponent extends Component {
 
   private _near: number = 0.1;
 
-  get near() {
+  @bindUi({ min: 0.1, max: 1000 }) get near() {
     return this._near;
   }
 
@@ -30,7 +30,7 @@ class CameraComponent extends Component {
 
   private _far: number = 2000;
 
-  get far() {
+  @bindUi({ min: 10, max: 10000 }) get far() {
     return this._far;
   }
 
@@ -45,7 +45,7 @@ class CameraComponent extends Component {
 
   private _fov: number = 75;
 
-  get fov() {
+  @bindUi({ min: 45, max: 160 }) get fov() {
     return this._fov;
   }
 

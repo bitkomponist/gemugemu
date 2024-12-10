@@ -32,6 +32,14 @@ class TransformComponent extends Component {
     this.object3d.rotation.copy(rotation);
   }
 
+  @bindUi() get visible() {
+    return this.object3d.visible;
+  }
+
+  set visible(visible) {
+    this.object3d.visible = visible;
+  }
+
   get quaternion() {
     return this.object3d.quaternion;
   }
